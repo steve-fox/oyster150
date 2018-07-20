@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+        crossorigin="" />
+
+    <!-- Make sure you put this AFTER Leaflet's CSS-->
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+        crossorigin=""></script>
+
+
+
+    <title>Oyster £1.50</title>
+</head>
+
+<style>
+    #mapid {
+        height: 780px;
+    }
+
+    .station-icon {
+
+        width: 10px;
+        height: 10px;
+        background: #2C7BBF;
+        border: white 2px solid;
+        -moz-border-radius: 8px;
+        -webkit-border-radius: 8px;
+        border-radius: 8px;
+        margin-top: -9px !important;
+
+    }
+
+    .station-icon.zone1 {
+        box-shadow: 0 0 0px 3px #666;
+    }
+
+    .station-icon.pinkreader-true {
+        xbackground-color: #eeb5eb !important;
+        box-shadow: 0 0 0px 6px #eeb5eb;
+    }
+
+    .station-icon.line-bakerloo {
+        background-color: #B36305;
+    }
+
+    .station-icon.line-central {
+        background-color: #E32017;
+    }
+
+    .station-icon.line-circle {
+        background-color: #FFD300;
+    }
+
+    .station-icon.line-district {
+        background-color: #00782A;
+    }
+
+    .station-icon.line-dlr {
+        background-color: #00A4A7;
+    }
+
+    .station-icon.line-hammersmith-and-city {
+        background-color: #F3A9BB;
+    }
+
+    .station-icon.line-jubilee {
+        background-color: #A0A5A9;
+    }
+
+    .station-icon.line-metropolitan {
+        background-color: #9B0056;
+    }
+
+    .station-icon.line-northern {
+        background-color: #000000;
+    }
+
+    .station-icon.line-london-overground {
+        background-color: #EE7C0E;
+    }
+
+    .station-icon.line-piccadilly {
+        background-color: #003688;
+    }
+
+    .station-icon.line-victoria {
+        background-color: #0098D4;
+    }
+
+    .station-icon.line-waterloo-and-city {
+        background-color: #95CDBA;
+    }
+
+    .station-icon.line-interchange {
+        background-color: #ddd;
+    }
+
+    .station-iconx::before {
+        content: 'efwwefew';
+        background-color: white;
+        position: relative;
+        left: 20px;
+        bottom: 2px;
+        color: #2A2B79;
+        padding: 3px;
+        font-size: 12px;
+        border: 1px #cccccc solid;
+    }
+
+    .station-label {
+        white-space: nowrap;
+        position: relative;
+        left: 20px;
+        bottom: 3px;
+        bottom: 8px;
+        background-colorx: white;
+        font-size: 12px;
+        display: none;
+    }
+
+    .station-label span {
+        background-color: white;
+        background-color: #fbfbfb;
+        padding: 3px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        width: fit-content;
+        color: #252525;
+        border-radius: 5px;
+    }
+
+
+    .fullname,
+    .mininame {
+        display: none;
+    }
+
+
+
+    .leaflet-control-layers-overlays label:nth-child(1) div span {
+        background-color: #E32017;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(2) div span {
+        background-color: #F3A9BB;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(3) div span {
+        background-color: #FFD300;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(4) div span {
+        background-color: #EE7C0E;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(5) div span {
+        background-color: #95CDBA;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(6) div span {
+        background-color: #A0A5A9;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(7) div span {
+        background-color: #B36305;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(8) div span {
+        background-color: #9B0056;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(9) div span {
+        background-color: #003688;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(10) div span {
+        background-color: #000000;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(11) div span {
+        background-color: #00782A;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(12) div span {
+        background-color: #00A4A7;
+    }
+
+    .leaflet-control-layers-overlays label:nth-child(13) div span {
+        background-color: #0098D4;
+        ;
+    }
+
+
+    .leaflet-control-layers-overlays label div span {
+        font-size: 0.9em;
+        padding: 1px;
+        color: white;
+        font-weight: 500;
+        padding-right: 5px;
+    }
+
+
+
+    label#hideStations, .key-description, span.showhide {max-width:170px;display: block;}
+
+
+#layerui > * {
+    margin-top: 10px;margin-bottom: 10px;
+}
+
+.leaflet-control-layers-overlays{padding-top:10px;}
+
+
+</style>
+
+<body>
+    <br/>
+
+
+    <div id="mapid"></div>
+
+</body>
+
+
+<script>
+
+
+
+    /*
+    */
+
+
+    //var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+    //var mymap = L.map('mapid').setView([51.509, -0.15], 13);
+
+
+    //var mymap = L.map('mapid');
+    //mymap.on('load', zoomTinker);
+    //mymap.setView([51.509, -0.15], 13);
+
+
+    var hideStationLine = true;
+
+
+    var mymap = L.map('mapid').setView([51.509, -0.15], 13);
+
+
+    //L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
+        //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        //attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        minZoom: 12,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1IjoiYm9ybmRpZ2l0YWwiLCJhIjoiY2ppeDd6d2YzMzIzZDNxbXAzZzl4cGRxNyJ9.svizivAiDIBlt5S78kb8Xg'
+    }).addTo(mymap);
+
+
+
+
+
+    //var southWest = new L.LatLng(40.712, -74.227),
+    //  northEast = new L.LatLng(40.774, -74.125),
+    //bounds = new L.LatLngBounds(southWest, northEast);
+
+    //mymap.fitBounds(bounds);
+
+
+    mymap.setMaxBounds([
+        [51.309, 0.286017],
+        [51.809, -0.50]
+    ]);
+
+
+
+
+
+    //L.marker([51.5, -0.09]).addTo(mymap);
+    //L.marker([51.51, -0.09]).addTo(mymap);
+
+
+
+
+    /*
+
+  const html = stationsList.map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', longitude: ${astation.lon}, latitude: ${astation.lat} },
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+
+
+      const html = stationsList.map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', longitude: ${astation.lon}, latitude: ${astation.lat}, zone: ${stationsList[0]['additionalProperties'][stationsList[0]['additionalProperties'].findIndex(x => x.key=="Zone")].value}},
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+
+
+
+
+--
+let html = stationsList.map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', longitude: ${astation.lon}, latitude: ${astation.lat}, zone: ${astation.additionalProperties.findIndex(x => x.key=="Zone")}},
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+--
+
+
+
+let html = stationsList.sort((a, b) => a.commonName > b.commonName ? 1 : -1).map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}',
+                name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}',
+                mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...',
+                longitude: ${astation.lon},
+                latitude: ${astation.lat},
+                lines: ${Array.prototype.map.call(stationsList[0].lines, s => ' ' +s.name).toString().trim();},
+                zone: '${(astation.additionalProperties.findIndex(x => x.key=="Zone") == -1) ? '-1' : astation.additionalProperties[astation.additionalProperties.findIndex(x => x.key=="Zone")].value}'},
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+
+
+html = stationsList.sort((a, b) => a.commonName > b.commonName ? 1 : -1).map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', longitude: ${astation.lon}, latitude: ${astation.lat}, lines: '${Array.prototype.map.call(astation.lines.filter(noBuses => {return ['Piccadilly', 'Bakerloo', 'Circle', 'Northern', 'Central', 'District', 'Jubilee', 'Metropolitan', 'Victoria', 'DLR', 'Hammersmith & City', 'Waterloo & City', 'Overground'].includes(noBuses.name)}), s => ' ' +s.name).toString().trim()}', zone: '${(astation.additionalProperties.findIndex(x => x.key=="Zone") == -1) ? '-1' : astation.additionalProperties[astation.additionalProperties.findIndex(x => x.key=="Zone")].value}'},
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+
+
+
+
+
+misc
+Array.prototype.map.call(stationsList[350].lines.filter(noBuses => {return ['Piccadilly', 'Bakerloo', 'Circle', 'Northern', 'Central', 'District', 'Jubilee', 'Metropolitan', 'Victoria', 'DLR', 'Hammersmith & City', 'Waterloo & City', 'Overground'].includes(noBuses.name)}), s => ' ' +s.name).toString().trim();
+//stationsList[0]['additionalProperties'][stationsList[0]['additionalProperties'].findIndex(x => x.key=="Zone")].value
+Array.prototype.map.call(stationsList[0].lines, s => ' ' +s.name).toString().trim();
+
+
+
+
+
+
+//THIS IS THE CURRENT METHOD AND STOPS DUPLICATES
+var lastStation = "";
+
+html = stationsList.sort((a, b) => a.commonName > b.commonName ? 1 : -1).map(astation => {
+    if (lastStation != astation.commonName.replace(/'/g, '&#39;')){
+        lastStation=astation.commonName.replace(/'/g, '&#39;');
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', \
+name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', \
+mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', \
+longitude: ${astation.lon}, \
+latitude: ${astation.lat}, \
+pinkreader: ${['Blackhorse Road Rail Station', 'Canada Water Rail Station', 'Clapham Junction Rail Station', 'Gospel Oak Rail Station', 'Gunnersbury Rail Station', 'Hackney Central Rail Station', 'Hackney Downs Rail Station', 'Highbury & Islington Rail Station', 'Kensington (Olympia) Rail Station', 'Richmond (London) Rail Station', 'Stratford Rail Station', 'Surrey Quays Rail Station', 'West Brompton Rail Station', 'Whitechapel Rail Station', 'Willesden Junction Rail Station', 'Rayners Lane Underground Station', 'Wimbledon Underground Station'].includes(astation.commonName) ? "true" : "false"}, \
+lines: '${Array.prototype.map.call(astation.lines.filter(noBuses => {return ['Piccadilly', 'Bakerloo', 'Circle', 'Northern', 'Central', 'District', 'Jubilee', 'Metropolitan', 'Victoria', 'DLR', 'Hammersmith & City', 'Waterloo & City', 'London Overground'].includes(noBuses.name)}), s => ' ' +s.name).toString().trim()}', \
+zone: '${(astation.additionalProperties.findIndex(x => x.key=="Zone") == -1) ? '-1' : astation.additionalProperties[astation.additionalProperties.findIndex(x => x.key=="Zone")].value}'},
+        `;
+        }
+      }).join('').replace('-1', 'zone data for this station unavailable from tfl data');
+    console.log('const stations = [' + html + '];');
+
+    const lines = [
+        { name: 'northern' },
+        { name: 'piccadilly' },
+        { name: 'central' },
+        { name: 'bakerloo' },
+        { name: 'district' },
+        { name: 'jubilee' },
+        { name: 'metropolitan' },
+        { name: 'victoria' },
+        { name: 'dlr' },
+        { name: 'hammersmith-city' },
+        { name: 'waterloo-city' },
+        { name: 'london-overground' },
+        { name: 'circle' }
+    ];
+
+
+
+
+// comment out when you don't need to hit tfl data
+const lines = [
+        { name: 'northern' }
+    ];
+
+
+
+
+
+    let stoppoints;
+    const stationsList = [];
+
+    lines.forEach(function (line, index) {
+
+        stoppoints = `https://api.tfl.gov.uk/line/${line.name}/stoppoints`;
+
+
+        fetch(stoppoints)
+            .then(blob => blob.json())
+            .then(data => stationsList.push(...data));
+
+    });
+*/
+
+
+
+
+    const stations = [{ fullname: 'Abbey Road DLR Station', name: 'Abbey Road', mininame: 'Abbey...', longitude: 0.003737, latitude: 51.531926, pinkreader: false, lines: 'DLR', zone: '2/3' },
+    { fullname: 'Acton Central Rail Station', name: 'Acton Central', mininame: 'Acton...', longitude: -0.262971, latitude: 51.508716, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Acton Town Underground Station', name: 'Acton Town', mininame: 'Acton...', longitude: -0.280462, latitude: 51.503057, pinkreader: false, lines: 'District, Piccadilly', zone: '3' },
+    { fullname: 'Aldgate East Underground Station', name: 'Aldgate East', mininame: 'Aldga...', longitude: -0.072384, latitude: 51.515037, pinkreader: false, lines: 'District, Hammersmith & City', zone: '1' },
+    { fullname: 'Aldgate Underground Station', name: 'Aldgate', mininame: 'Aldga...', longitude: -0.075689, latitude: 51.514246, pinkreader: false, lines: 'Circle, Metropolitan', zone: '1' },
+    { fullname: 'All Saints DLR Station', name: 'All Saints', mininame: 'All S...', longitude: -0.013135, latitude: 51.511, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Alperton Underground Station', name: 'Alperton', mininame: 'Alper...', longitude: -0.29961, latitude: 51.540627, pinkreader: false, lines: 'Piccadilly', zone: '4' },
+    { fullname: 'Amersham Underground Station', name: 'Amersham', mininame: 'Amers...', longitude: -0.607714, latitude: 51.674126, pinkreader: false, lines: 'Metropolitan', zone: '9' },
+    { fullname: 'Anerley Rail Station', name: 'Anerley', mininame: 'Anerl...', longitude: -0.065886, latitude: 51.412153, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Angel Underground Station', name: 'Angel', mininame: 'Angel...', longitude: -0.105992, latitude: 51.532796, pinkreader: false, lines: 'Northern', zone: '1' },
+    { fullname: 'Archway Underground Station', name: 'Archway', mininame: 'Archw...', longitude: -0.134819, latitude: 51.565478, pinkreader: false, lines: 'Northern', zone: '2+3' },
+    { fullname: 'Arnos Grove Underground Station', name: 'Arnos Grove', mininame: 'Arnos...', longitude: -0.133062, latitude: 51.616446, pinkreader: false, lines: 'Piccadilly', zone: '4' },
+    { fullname: 'Arsenal Underground Station', name: 'Arsenal', mininame: 'Arsen...', longitude: -0.107457, latitude: 51.558655, pinkreader: false, lines: 'Piccadilly', zone: '2' },
+    { fullname: 'Baker Street Underground Station', name: 'Baker Street', mininame: 'Baker...', longitude: -0.15713, latitude: 51.522883, pinkreader: false, lines: 'Bakerloo, Circle, Hammersmith & City, Jubilee, Metropolitan', zone: '1' },
+    { fullname: 'Balham Underground Station', name: 'Balham', mininame: 'Balha...', longitude: -0.152997, latitude: 51.443288, pinkreader: false, lines: 'Northern', zone: '3' },
+    { fullname: 'Bank DLR Station', name: 'Bank', mininame: 'Bank ...', longitude: -0.088515, latitude: 51.513233, pinkreader: false, lines: 'DLR', zone: '1' },
+    { fullname: 'Bank Underground Station', name: 'Bank', mininame: 'Bank ...', longitude: -0.088204, latitude: 51.512751, pinkreader: false, lines: 'Central, Northern, Waterloo & City', zone: '1' },
+    { fullname: 'Barbican Underground Station', name: 'Barbican', mininame: 'Barbi...', longitude: -0.097993, latitude: 51.520275, pinkreader: false, lines: 'Circle, Hammersmith & City, Metropolitan', zone: '1' },
+    { fullname: 'Barking Rail Station', name: 'Barking', mininame: 'Barki...', longitude: 0.080903, latitude: 51.539495, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Barking Underground Station', name: 'Barking', mininame: 'Barki...', longitude: 0.081053, latitude: 51.539321, pinkreader: false, lines: 'District, Hammersmith & City', zone: '4' },
+    { fullname: 'Barkingside Underground Station', name: 'Barkingside', mininame: 'Barki...', longitude: 0.088585, latitude: 51.585689, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Barons Court Underground Station', name: 'Barons Court', mininame: 'Baron...', longitude: -0.213427, latitude: 51.490311, pinkreader: false, lines: 'District, Piccadilly', zone: '2' },
+    { fullname: 'Bayswater Underground Station', name: 'Bayswater', mininame: 'Baysw...', longitude: -0.187938, latitude: 51.512284, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'Beckton DLR Station', name: 'Beckton', mininame: 'Beckt...', longitude: 0.061453, latitude: 51.514362, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Beckton Park DLR Station', name: 'Beckton Park', mininame: 'Beckt...', longitude: 0.054932, latitude: 51.508793, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Becontree Underground Station', name: 'Becontree', mininame: 'Becon...', longitude: 0.127016, latitude: 51.540331, pinkreader: false, lines: 'District', zone: '5' },
+    { fullname: 'Belsize Park Underground Station', name: 'Belsize Park', mininame: 'Belsi...', longitude: -0.164648, latitude: 51.550311, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Bermondsey Underground Station', name: 'Bermondsey', mininame: 'Bermo...', longitude: -0.063769, latitude: 51.497953, pinkreader: false, lines: 'Jubilee', zone: '2' },
+    { fullname: 'Bethnal Green Rail Station', name: 'Bethnal Green', mininame: 'Bethn...', longitude: -0.059568, latitude: 51.523917, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Bethnal Green Underground Station', name: 'Bethnal Green', mininame: 'Bethn...', longitude: -0.055506, latitude: 51.527222, pinkreader: false, lines: 'Central', zone: '2' },
+    { fullname: 'Blackfriars Underground Station', name: 'Blackfriars', mininame: 'Black...', longitude: -0.103659, latitude: 51.511581, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'Blackhorse Road Rail Station', name: 'Blackhorse Road', mininame: 'Black...', longitude: -0.041236, latitude: 51.586605, pinkreader: true, lines: 'London Overground', zone: '3' },
+    { fullname: 'Blackhorse Road Underground Station', name: 'Blackhorse Road', mininame: 'Black...', longitude: -0.04115, latitude: 51.586919, pinkreader: false, lines: 'Victoria', zone: '3' },
+    { fullname: 'Blackwall DLR Station', name: 'Blackwall', mininame: 'Black...', longitude: -0.006969, latitude: 51.507991, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Bond Street Underground Station', name: 'Bond Street', mininame: 'Bond ...', longitude: -0.149723, latitude: 51.514304, pinkreader: false, lines: 'Central, Jubilee', zone: '1' },
+    { fullname: 'Borough Underground Station', name: 'Borough', mininame: 'Borou...', longitude: -0.09337, latitude: 51.501199, pinkreader: false, lines: 'Northern', zone: '1' },
+    { fullname: 'Boston Manor Underground Station', name: 'Boston Manor', mininame: 'Bosto...', longitude: -0.324939, latitude: 51.495635, pinkreader: false, lines: 'Piccadilly', zone: '4' },
+    { fullname: 'Bounds Green Underground Station', name: 'Bounds Green', mininame: 'Bound...', longitude: -0.124235, latitude: 51.607034, pinkreader: false, lines: 'Piccadilly', zone: '3+4' },
+    { fullname: 'Bow Church DLR Station', name: 'Bow Church', mininame: 'Bow C...', longitude: -0.020936, latitude: 51.527858, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Bow Road Underground Station', name: 'Bow Road', mininame: 'Bow R...', longitude: -0.025128, latitude: 51.52694, pinkreader: false, lines: 'District, Hammersmith & City', zone: '2' },
+    { fullname: 'Brent Cross Underground Station', name: 'Brent Cross', mininame: 'Brent...', longitude: -0.213622, latitude: 51.57665, pinkreader: false, lines: 'Northern', zone: '3' },
+    { fullname: 'Brixton Underground Station', name: 'Brixton', mininame: 'Brixt...', longitude: -0.114888, latitude: 51.462618, pinkreader: false, lines: 'Victoria', zone: '2' },
+    { fullname: 'Brockley Rail Station', name: 'Brockley', mininame: 'Brock...', longitude: -0.037537, latitude: 51.464649, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Bromley-by-Bow Underground Station', name: 'Bromley-by-Bow', mininame: 'Broml...', longitude: -0.011538, latitude: 51.524839, pinkreader: false, lines: 'District, Hammersmith & City', zone: '2+3' },
+    { fullname: 'Brondesbury Park Rail Station', name: 'Brondesbury Park', mininame: 'Brond...', longitude: -0.210128, latitude: 51.540699, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Brondesbury Rail Station', name: 'Brondesbury', mininame: 'Brond...', longitude: -0.202309, latitude: 51.545166, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Bruce Grove Rail Station', name: 'Bruce Grove', mininame: 'Bruce...', longitude: -0.069867, latitude: 51.593959, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Buckhurst Hill Underground Station', name: 'Buckhurst Hill', mininame: 'Buckh...', longitude: 0.046757, latitude: 51.626605, pinkreader: false, lines: 'Central', zone: '5' },
+    { fullname: 'Burnt Oak Underground Station', name: 'Burnt Oak', mininame: 'Burnt...', longitude: -0.264048, latitude: 51.602774, pinkreader: false, lines: 'Northern', zone: '4' },
+    { fullname: 'Bush Hill Park Rail Station', name: 'Bush Hill Park', mininame: 'Bush ...', longitude: -0.069221, latitude: 51.641519, pinkreader: false, lines: 'London Overground', zone: '5' },
+    { fullname: 'Bushey Rail Station', name: 'Bushey', mininame: 'Bushe...', longitude: -0.384749, latitude: 51.645582, pinkreader: false, lines: 'London Overground', zone: '8' },
+    { fullname: 'Caledonian Road & Barnsbury Rail Station', name: 'Caledonian Road & Barnsbury', mininame: 'Caled...', longitude: -0.116729, latitude: 51.543041, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Caledonian Road Underground Station', name: 'Caledonian Road', mininame: 'Caled...', longitude: -0.118493, latitude: 51.548519, pinkreader: false, lines: 'Piccadilly', zone: '2' },
+    { fullname: 'Cambridge Heath (London) Rail Station', name: 'Cambridge Heath (London)', mininame: 'Cambr...', longitude: -0.057279, latitude: 51.531973, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Camden Road Rail Station', name: 'Camden Road', mininame: 'Camde...', longitude: -0.138701, latitude: 51.541791, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Camden Town Underground Station', name: 'Camden Town', mininame: 'Camde...', longitude: -0.14274, latitude: 51.539292, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Canada Water Rail Station', name: 'Canada Water', mininame: 'Canad...', longitude: -0.04972, latitude: 51.49799, pinkreader: true, lines: 'London Overground', zone: '2' },
+    { fullname: 'Canada Water Underground Station', name: 'Canada Water', mininame: 'Canad...', longitude: -0.049722, latitude: 51.497945, pinkreader: false, lines: 'Jubilee', zone: '2' },
+    { fullname: 'Canary Wharf DLR Station', name: 'Canary Wharf', mininame: 'Canar...', longitude: -0.020997, latitude: 51.504838, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Canary Wharf Underground Station', name: 'Canary Wharf', mininame: 'Canar...', longitude: -0.018246, latitude: 51.503488, pinkreader: false, lines: 'Jubilee', zone: '2' },
+    { fullname: 'Canning Town DLR Station', name: 'Canning Town', mininame: 'Canni...', longitude: 0.008101, latitude: 51.514127, pinkreader: false, lines: 'DLR', zone: '2/3' },
+    { fullname: 'Canning Town Underground Station', name: 'Canning Town', mininame: 'Canni...', longitude: 0.008322, latitude: 51.513584, pinkreader: false, lines: 'Jubilee', zone: '2/3' },
+    { fullname: 'Cannon Street Underground Station', name: 'Cannon Street', mininame: 'Canno...', longitude: -0.090432, latitude: 51.51151, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'Canonbury Rail Station', name: 'Canonbury', mininame: 'Canon...', longitude: -0.092191, latitude: 51.548732, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Canons Park Underground Station', name: 'Canons Park', mininame: 'Canon...', longitude: -0.294693, latitude: 51.607701, pinkreader: false, lines: 'Jubilee', zone: '5' },
+    { fullname: 'Carpenders Park Rail Station', name: 'Carpenders Park', mininame: 'Carpe...', longitude: -0.385939, latitude: 51.628351, pinkreader: false, lines: 'London Overground', zone: '7' },
+    { fullname: 'Chalfont & Latimer Underground Station', name: 'Chalfont & Latimer', mininame: 'Chalf...', longitude: -0.560689, latitude: 51.667985, pinkreader: false, lines: 'Metropolitan', zone: '8' },
+    { fullname: 'Chalk Farm Underground Station', name: 'Chalk Farm', mininame: 'Chalk...', longitude: -0.153388, latitude: 51.544118, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Chancery Lane Underground Station', name: 'Chancery Lane', mininame: 'Chanc...', longitude: -0.111583, latitude: 51.518247, pinkreader: false, lines: 'Central', zone: '1' },
+    { fullname: 'Charing Cross Underground Station', name: 'Charing Cross', mininame: 'Chari...', longitude: -0.127277, latitude: 51.50741, pinkreader: false, lines: 'Bakerloo, Northern', zone: '1' },
+    { fullname: 'Chesham Underground Station', name: 'Chesham', mininame: 'Chesh...', longitude: -0.611247, latitude: 51.705208, pinkreader: false, lines: 'Metropolitan', zone: '9' },
+    { fullname: 'Cheshunt Rail Station', name: 'Cheshunt', mininame: 'Chesh...', longitude: -0.02396, latitude: 51.702876, pinkreader: false, lines: 'London Overground', zone: '8' },
+    { fullname: 'Chigwell Underground Station', name: 'Chigwell', mininame: 'Chigw...', longitude: 0.075041, latitude: 51.617916, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Chingford Rail Station', name: 'Chingford', mininame: 'Ching...', longitude: 0.009897, latitude: 51.633087, pinkreader: false, lines: 'London Overground', zone: '5' },
+    { fullname: 'Chiswick Park Underground Station', name: 'Chiswick Park', mininame: 'Chisw...', longitude: -0.267972, latitude: 51.494627, pinkreader: false, lines: 'District, Piccadilly', zone: '3' },
+    { fullname: 'Chorleywood Underground Station', name: 'Chorleywood', mininame: 'Chorl...', longitude: -0.518461, latitude: 51.654358, pinkreader: false, lines: 'Metropolitan', zone: '7' },
+    { fullname: 'Clapham Common Underground Station', name: 'Clapham Common', mininame: 'Claph...', longitude: -0.138317, latitude: 51.461742, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Clapham High Street Rail Station', name: 'Clapham High Street', mininame: 'Claph...', longitude: -0.132522, latitude: 51.465481, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Clapham Junction Rail Station', name: 'Clapham Junction', mininame: 'Claph...', longitude: -0.170221, latitude: 51.464187, pinkreader: true, lines: 'London Overground', zone: 'zone data for this station unavailable from tfl data' },
+    { fullname: 'Clapham North Underground Station', name: 'Clapham North', mininame: 'Claph...', longitude: -0.130016, latitude: 51.465135, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Clapham South Underground Station', name: 'Clapham South', mininame: 'Claph...', longitude: -0.147582, latitude: 51.452654, pinkreader: false, lines: 'Northern', zone: '2+3' },
+    { fullname: 'Clapton Rail Station', name: 'Clapton', mininame: 'Clapt...', longitude: -0.057025, latitude: 51.561644, pinkreader: false, lines: 'London Overground', zone: '2+3' },
+    { fullname: 'Cockfosters Underground Station', name: 'Cockfosters', mininame: 'Cockf...', longitude: -0.149171, latitude: 51.65152, pinkreader: false, lines: 'Piccadilly', zone: '5' },
+    { fullname: 'Colindale Underground Station', name: 'Colindale', mininame: 'Colin...', longitude: -0.249919, latitude: 51.595424, pinkreader: false, lines: 'Northern', zone: '4' },
+    { fullname: 'Colliers Wood Underground Station', name: 'Colliers Wood', mininame: 'Colli...', longitude: -0.178086, latitude: 51.41816, pinkreader: false, lines: 'Northern', zone: '3' },
+    { fullname: 'Covent Garden Underground Station', name: 'Covent Garden', mininame: 'Coven...', longitude: -0.124436, latitude: 51.513093, pinkreader: false, lines: 'Piccadilly', zone: '1' },
+    { fullname: 'Crossharbour DLR Station', name: 'Crossharbour', mininame: 'Cross...', longitude: -0.014606, latitude: 51.495728, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Crouch Hill Rail Station', name: 'Crouch Hill', mininame: 'Crouc...', longitude: -0.117149, latitude: 51.571302, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Croxley Underground Station', name: 'Croxley', mininame: 'Croxl...', longitude: -0.441718, latitude: 51.647044, pinkreader: false, lines: 'Metropolitan', zone: '7' },
+    { fullname: 'Crystal Palace Rail Station', name: 'Crystal Palace', mininame: 'Cryst...', longitude: -0.07261, latitude: 51.418109, pinkreader: false, lines: 'London Overground', zone: '3+4' },
+    { fullname: 'Custom House (for ExCel) DLR Station', name: 'Custom House (for ExCel)', mininame: 'Custo...', longitude: 0.026699, latitude: 51.509716, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Cutty Sark (for Maritime Greenwich) DLR Station', name: 'Cutty Sark (for Maritime Greenwich)', mininame: 'Cutty...', longitude: -0.01081, latitude: 51.481671, pinkreader: false, lines: 'DLR', zone: '2+3' },
+    { fullname: 'Cyprus DLR Station', name: 'Cyprus', mininame: 'Cypru...', longitude: 0.063925, latitude: 51.508473, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Dagenham East Underground Station', name: 'Dagenham East', mininame: 'Dagen...', longitude: 0.166017, latitude: 51.544096, pinkreader: false, lines: 'District', zone: '5' },
+    { fullname: 'Dagenham Heathway Underground Station', name: 'Dagenham Heathway', mininame: 'Dagen...', longitude: 0.147527, latitude: 51.541639, pinkreader: false, lines: 'District', zone: '5' },
+    { fullname: 'Dalston Junction Rail Station', name: 'Dalston Junction', mininame: 'Dalst...', longitude: -0.075137, latitude: 51.546116, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Dalston Kingsland Rail Station', name: 'Dalston Kingsland', mininame: 'Dalst...', longitude: -0.075701, latitude: 51.548148, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Debden Underground Station', name: 'Debden', mininame: 'Debde...', longitude: 0.083782, latitude: 51.645386, pinkreader: false, lines: 'Central', zone: '6' },
+    { fullname: 'Denmark Hill Rail Station', name: 'Denmark Hill', mininame: 'Denma...', longitude: -0.089361, latitude: 51.468203, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Deptford Bridge DLR Station', name: 'Deptford Bridge', mininame: 'Deptf...', longitude: -0.022438, latitude: 51.474215, pinkreader: false, lines: 'DLR', zone: '2+3' },
+    { fullname: 'Devons Road DLR Station', name: 'Devons Road', mininame: 'Devon...', longitude: -0.017615, latitude: 51.522667, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Dollis Hill Underground Station', name: 'Dollis Hill', mininame: 'Dolli...', longitude: -0.239068, latitude: 51.551955, pinkreader: false, lines: 'Jubilee', zone: '3' },
+    { fullname: 'Ealing Broadway Underground Station', name: 'Ealing Broadway', mininame: 'Ealin...', longitude: -0.301457, latitude: 51.515017, pinkreader: false, lines: 'Central, District', zone: '3' },
+    { fullname: 'Ealing Common Underground Station', name: 'Ealing Common', mininame: 'Ealin...', longitude: -0.288265, latitude: 51.51014, pinkreader: false, lines: 'District, Piccadilly', zone: '3' },
+    { fullname: 'Earl&#39;s Court Underground Station', name: 'Earl&#39;s Court', mininame: 'Earl&...', longitude: -0.193378, latitude: 51.492063, pinkreader: false, lines: 'District, Piccadilly', zone: '1+2' },
+    { fullname: 'East Acton Underground Station', name: 'East Acton', mininame: 'East ...', longitude: -0.247248, latitude: 51.516612, pinkreader: false, lines: 'Central', zone: '2' },
+    { fullname: 'East Finchley Underground Station', name: 'East Finchley', mininame: 'East ...', longitude: -0.165012, latitude: 51.587131, pinkreader: false, lines: 'Northern', zone: '3' },
+    { fullname: 'East Ham Underground Station', name: 'East Ham', mininame: 'East ...', longitude: 0.051186, latitude: 51.538948, pinkreader: false, lines: 'District, Hammersmith & City', zone: '3+4' },
+    { fullname: 'East India DLR Station', name: 'East India', mininame: 'East ...', longitude: -0.002326, latitude: 51.509359, pinkreader: false, lines: 'DLR', zone: '2+3' },
+    { fullname: 'East Putney Underground Station', name: 'East Putney', mininame: 'East ...', longitude: -0.211, latitude: 51.459205, pinkreader: false, lines: 'District', zone: '2+3' },
+    { fullname: 'Eastcote Underground Station', name: 'Eastcote', mininame: 'Eastc...', longitude: -0.397373, latitude: 51.576506, pinkreader: false, lines: 'Metropolitan, Piccadilly', zone: '5' },
+    { fullname: 'Edgware Road (Bakerloo) Underground Station', name: 'Edgware Road (Bakerloo)', mininame: 'Edgwa...', longitude: -0.17015, latitude: 51.520299, pinkreader: false, lines: 'Bakerloo', zone: '1' },
+    { fullname: 'Edgware Road (Circle Line) Underground Station', name: 'Edgware Road (Circle Line)', mininame: 'Edgwa...', longitude: -0.167832, latitude: 51.519858, pinkreader: false, lines: 'Circle, District, Hammersmith & City', zone: '1' },
+    { fullname: 'Edgware Underground Station', name: 'Edgware', mininame: 'Edgwa...', longitude: -0.274928, latitude: 51.613653, pinkreader: false, lines: 'Northern', zone: '5' },
+    { fullname: 'Edmonton Green Rail Station', name: 'Edmonton Green', mininame: 'Edmon...', longitude: -0.061112, latitude: 51.624929, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Elephant & Castle Underground Station', name: 'Elephant & Castle', mininame: 'Eleph...', longitude: -0.100606, latitude: 51.494536, pinkreader: false, lines: 'Bakerloo, Northern', zone: '1+2' },
+    { fullname: 'Elm Park Underground Station', name: 'Elm Park', mininame: 'Elm P...', longitude: 0.19864, latitude: 51.549775, pinkreader: false, lines: 'District', zone: '6' },
+    { fullname: 'Elverson Road DLR Station', name: 'Elverson Road', mininame: 'Elver...', longitude: -0.016728, latitude: 51.469074, pinkreader: false, lines: 'DLR', zone: '2+3' },
+    { fullname: 'Embankment Underground Station', name: 'Embankment', mininame: 'Emban...', longitude: -0.122666, latitude: 51.507058, pinkreader: false, lines: 'Bakerloo, Circle, District, Northern', zone: '1' },
+    { fullname: 'Emerson Park Rail Station', name: 'Emerson Park', mininame: 'Emers...', longitude: 0.220113, latitude: 51.568642, pinkreader: false, lines: 'London Overground', zone: '6' },
+    { fullname: 'Enfield Town Rail Station', name: 'Enfield Town', mininame: 'Enfie...', longitude: -0.079328, latitude: 51.652026, pinkreader: false, lines: 'London Overground', zone: '5' },
+    { fullname: 'Epping Underground Station', name: 'Epping', mininame: 'Eppin...', longitude: 0.113767, latitude: 51.69368, pinkreader: false, lines: 'Central', zone: '6' },
+    { fullname: 'Euston Square Underground Station', name: 'Euston Square', mininame: 'Eusto...', longitude: -0.135829, latitude: 51.525604, pinkreader: false, lines: 'Circle, Hammersmith & City, Metropolitan', zone: '1' },
+    { fullname: 'Euston Underground Station', name: 'Euston', mininame: 'Eusto...', longitude: -0.1323, latitude: 51.528344, pinkreader: false, lines: 'Northern, Victoria', zone: '1' },
+    { fullname: 'Fairlop Underground Station', name: 'Fairlop', mininame: 'Fairl...', longitude: 0.091004, latitude: 51.595618, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Farringdon Underground Station', name: 'Farringdon', mininame: 'Farri...', longitude: -0.104913, latitude: 51.520252, pinkreader: false, lines: 'Circle, Hammersmith & City, Metropolitan', zone: '1' },
+    { fullname: 'Finchley Central Underground Station', name: 'Finchley Central', mininame: 'Finch...', longitude: -0.192527, latitude: 51.600921, pinkreader: false, lines: 'Northern', zone: '4' },
+    { fullname: 'Finchley Road & Frognal Rail Station', name: 'Finchley Road & Frognal', mininame: 'Finch...', longitude: -0.183141, latitude: 51.550266, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Finchley Road Underground Station', name: 'Finchley Road', mininame: 'Finch...', longitude: -0.179845, latitude: 51.546825, pinkreader: false, lines: 'Jubilee, Metropolitan', zone: '2' },
+    { fullname: 'Finsbury Park Underground Station', name: 'Finsbury Park', mininame: 'Finsb...', longitude: -0.106825, latitude: 51.564158, pinkreader: false, lines: 'Piccadilly, Victoria', zone: '2' },
+    { fullname: 'Forest Hill Rail Station', name: 'Forest Hill', mininame: 'Fores...', longitude: -0.053157, latitude: 51.43928, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Fulham Broadway Underground Station', name: 'Fulham Broadway', mininame: 'Fulha...', longitude: -0.195422, latitude: 51.480081, pinkreader: false, lines: 'District', zone: '2' },
+    { fullname: 'Gallions Reach DLR Station', name: 'Gallions Reach', mininame: 'Galli...', longitude: 0.071555, latitude: 51.508941, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Gants Hill Underground Station', name: 'Gants Hill', mininame: 'Gants...', longitude: 0.066185, latitude: 51.576544, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Gloucester Road Underground Station', name: 'Gloucester Road', mininame: 'Glouc...', longitude: -0.182658, latitude: 51.494316, pinkreader: false, lines: 'Circle, District, Piccadilly', zone: '1' },
+    { fullname: 'Golders Green Underground Station', name: 'Golders Green', mininame: 'Golde...', longitude: -0.194039, latitude: 51.572259, pinkreader: false, lines: 'Northern', zone: '3' },
+    { fullname: 'Goldhawk Road Underground Station', name: 'Goldhawk Road', mininame: 'Goldh...', longitude: -0.226715, latitude: 51.502005, pinkreader: false, lines: 'Circle, Hammersmith & City', zone: '2' },
+    { fullname: 'Goodge Street Underground Station', name: 'Goodge Street', mininame: 'Goodg...', longitude: -0.134361, latitude: 51.520599, pinkreader: false, lines: 'Northern', zone: '1' },
+    { fullname: 'Gospel Oak Rail Station', name: 'Gospel Oak', mininame: 'Gospe...', longitude: -0.15077, latitude: 51.555335, pinkreader: true, lines: 'London Overground', zone: '2' },
+    { fullname: 'Grange Hill Underground Station', name: 'Grange Hill', mininame: 'Grang...', longitude: 0.092066, latitude: 51.613378, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Great Portland Street Underground Station', name: 'Great Portland Street', mininame: 'Great...', longitude: -0.144262, latitude: 51.52384, pinkreader: false, lines: 'Circle, Hammersmith & City, Metropolitan', zone: '1' },
+    { fullname: 'Green Park Underground Station', name: 'Green Park', mininame: 'Green...', longitude: -0.142787, latitude: 51.506947, pinkreader: false, lines: 'Jubilee, Piccadilly, Victoria', zone: '1' },
+    { fullname: 'Greenford Underground Station', name: 'Greenford', mininame: 'Green...', longitude: -0.34605, latitude: 51.542424, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Greenwich DLR Station', name: 'Greenwich', mininame: 'Green...', longitude: -0.013673, latitude: 51.478087, pinkreader: false, lines: 'DLR', zone: '2+3' },
+    { fullname: 'Gunnersbury Rail Station', name: 'Gunnersbury', mininame: 'Gunne...', longitude: -0.275286, latitude: 51.491678, pinkreader: true, lines: 'London Overground', zone: '3' },
+    { fullname: 'Gunnersbury Underground Station', name: 'Gunnersbury', mininame: 'Gunne...', longitude: -0.275267, latitude: 51.491803, pinkreader: false, lines: 'District', zone: '3' },
+    { fullname: 'Hackney Central Rail Station', name: 'Hackney Central', mininame: 'Hackn...', longitude: -0.056058, latitude: 51.547105, pinkreader: true, lines: 'London Overground', zone: '2' },
+    { fullname: 'Hackney Downs Rail Station', name: 'Hackney Downs', mininame: 'Hackn...', longitude: -0.060819, latitude: 51.548757, pinkreader: true, lines: 'London Overground', zone: '2' },
+    { fullname: 'Hackney Wick Rail Station', name: 'Hackney Wick', mininame: 'Hackn...', longitude: -0.02492, latitude: 51.54341, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Haggerston Rail Station', name: 'Haggerston', mininame: 'Hagge...', longitude: -0.075666, latitude: 51.538705, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Hainault Underground Station', name: 'Hainault', mininame: 'Haina...', longitude: 0.093482, latitude: 51.603659, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Hammersmith (Dist&Picc Line) Underground Station', name: 'Hammersmith (Dist&Picc Line)', mininame: 'Hamme...', longitude: -0.22362, latitude: 51.4923, pinkreader: false, lines: 'District, Piccadilly', zone: '2' },
+    { fullname: 'Hammersmith (H&C Line) Underground Station', name: 'Hammersmith (H&C Line)', mininame: 'Hamme...', longitude: -0.225013, latitude: 51.493535, pinkreader: false, lines: 'Circle, Hammersmith & City', zone: '2' },
+    { fullname: 'Hampstead Heath Rail Station', name: 'Hampstead Heath', mininame: 'Hamps...', longitude: -0.165705, latitude: 51.55521, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Hampstead Underground Station', name: 'Hampstead', mininame: 'Hamps...', longitude: -0.178487, latitude: 51.556632, pinkreader: false, lines: 'Northern', zone: '2+3' },
+    { fullname: 'Hanger Lane Underground Station', name: 'Hanger Lane', mininame: 'Hange...', longitude: -0.292704, latitude: 51.530177, pinkreader: false, lines: 'Central', zone: '3' },
+    { fullname: 'Harlesden Rail Station', name: 'Harlesden', mininame: 'Harle...', longitude: -0.257667, latitude: 51.536289, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Harlesden Underground Station', name: 'Harlesden', mininame: 'Harle...', longitude: -0.257883, latitude: 51.53631, pinkreader: false, lines: 'Bakerloo', zone: '3' },
+    { fullname: 'Harringay Green Lanes Rail Station', name: 'Harringay Green Lanes', mininame: 'Harri...', longitude: -0.098144, latitude: 51.577182, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Harrow & Wealdstone Rail Station', name: 'Harrow & Wealdstone', mininame: 'Harro...', longitude: -0.334571, latitude: 51.592169, pinkreader: false, lines: 'London Overground', zone: '5' },
+    { fullname: 'Harrow & Wealdstone Underground Station', name: 'Harrow & Wealdstone', mininame: 'Harro...', longitude: -0.335217, latitude: 51.592268, pinkreader: false, lines: 'Bakerloo', zone: '5' },
+    { fullname: 'Harrow-on-the-Hill Underground Station', name: 'Harrow-on-the-Hill', mininame: 'Harro...', longitude: -0.337225, latitude: 51.579195, pinkreader: false, lines: 'Metropolitan', zone: '5' },
+    { fullname: 'Hatch End Rail Station', name: 'Hatch End', mininame: 'Hatch...', longitude: -0.368601, latitude: 51.609417, pinkreader: false, lines: 'London Overground', zone: '6' },
+    { fullname: 'Hatton Cross Underground Station', name: 'Hatton Cross', mininame: 'Hatto...', longitude: -0.423191, latitude: 51.466747, pinkreader: false, lines: 'Piccadilly', zone: '5+6' },
+    { fullname: 'Headstone Lane Rail Station', name: 'Headstone Lane', mininame: 'Heads...', longitude: -0.35722, latitude: 51.602649, pinkreader: false, lines: 'London Overground', zone: '5' },
+    { fullname: 'Heathrow Terminal 4 Underground Station', name: 'Heathrow Terminal 4', mininame: 'Heath...', longitude: -0.445771, latitude: 51.458524, pinkreader: false, lines: 'Piccadilly', zone: '6' },
+    { fullname: 'Heathrow Terminal 5 Underground Station', name: 'Heathrow Terminal 5', mininame: 'Heath...', longitude: -0.49056, latitude: 51.470052, pinkreader: false, lines: 'Piccadilly', zone: '6' },
+    { fullname: 'Heathrow Terminals 2 & 3 Underground Station', name: 'Heathrow Terminals 2 & 3', mininame: 'Heath...', longitude: -0.452265, latitude: 51.471235, pinkreader: false, lines: 'Piccadilly', zone: '6' },
+    { fullname: 'Hendon Central Underground Station', name: 'Hendon Central', mininame: 'Hendo...', longitude: -0.226424, latitude: 51.583301, pinkreader: false, lines: 'Northern', zone: '3+4' },
+    { fullname: 'Heron Quays DLR Station', name: 'Heron Quays', mininame: 'Heron...', longitude: -0.021421, latitude: 51.503379, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'High Barnet Underground Station', name: 'High Barnet', mininame: 'High ...', longitude: -0.194298, latitude: 51.650541, pinkreader: false, lines: 'Northern', zone: '5' },
+    { fullname: 'High Street Kensington Underground Station', name: 'High Street Kensington', mininame: 'High ...', longitude: -0.192792, latitude: 51.501055, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'Highams Park Rail Station', name: 'Highams Park', mininame: 'Higha...', longitude: -0.000222, latitude: 51.60835, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Highbury & Islington Rail Station', name: 'Highbury & Islington', mininame: 'Highb...', longitude: -0.103764, latitude: 51.546177, pinkreader: true, lines: 'London Overground', zone: '2' },
+    { fullname: 'Highbury & Islington Underground Station', name: 'Highbury & Islington', mininame: 'Highb...', longitude: -0.103324, latitude: 51.54635, pinkreader: false, lines: 'Victoria', zone: '2' },
+    { fullname: 'Highgate Underground Station', name: 'Highgate', mininame: 'Highg...', longitude: -0.145857, latitude: 51.577532, pinkreader: false, lines: 'Northern', zone: '3' },
+    { fullname: 'Hillingdon Underground Station', name: 'Hillingdon', mininame: 'Hilli...', longitude: -0.449828, latitude: 51.553715, pinkreader: false, lines: 'Metropolitan, Piccadilly', zone: '6' },
+    { fullname: 'Holborn Underground Station', name: 'Holborn', mininame: 'Holbo...', longitude: -0.120475, latitude: 51.51758, pinkreader: false, lines: 'Central, Piccadilly', zone: '1' },
+    { fullname: 'Holland Park Underground Station', name: 'Holland Park', mininame: 'Holla...', longitude: -0.205679, latitude: 51.507143, pinkreader: false, lines: 'Central', zone: '2' },
+    { fullname: 'Holloway Road Underground Station', name: 'Holloway Road', mininame: 'Hollo...', longitude: -0.113244, latitude: 51.552697, pinkreader: false, lines: 'Piccadilly', zone: '2' },
+    { fullname: 'Homerton Rail Station', name: 'Homerton', mininame: 'Homer...', longitude: -0.04236, latitude: 51.547012, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Honor Oak Park Rail Station', name: 'Honor Oak Park', mininame: 'Honor...', longitude: -0.045505, latitude: 51.449989, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Hornchurch Underground Station', name: 'Hornchurch', mininame: 'Hornc...', longitude: 0.219116, latitude: 51.554093, pinkreader: false, lines: 'District', zone: '6' },
+    { fullname: 'Hounslow Central Underground Station', name: 'Hounslow Central', mininame: 'Houns...', longitude: -0.366578, latitude: 51.471295, pinkreader: false, lines: 'Piccadilly', zone: '4' },
+    { fullname: 'Hounslow East Underground Station', name: 'Hounslow East', mininame: 'Houns...', longitude: -0.356474, latitude: 51.473213, pinkreader: false, lines: 'Piccadilly', zone: '4' },
+    { fullname: 'Hounslow West Underground Station', name: 'Hounslow West', mininame: 'Houns...', longitude: -0.386544, latitude: 51.473469, pinkreader: false, lines: 'Piccadilly', zone: '5' },
+    { fullname: 'Hoxton Rail Station', name: 'Hoxton', mininame: 'Hoxto...', longitude: -0.075681, latitude: 51.531512, pinkreader: false, lines: 'London Overground', zone: '1+2' },
+    { fullname: 'Hyde Park Corner Underground Station', name: 'Hyde Park Corner', mininame: 'Hyde ...', longitude: -0.152441, latitude: 51.503035, pinkreader: false, lines: 'Piccadilly', zone: '1' },
+    { fullname: 'Ickenham Underground Station', name: 'Ickenham', mininame: 'Icken...', longitude: -0.442001, latitude: 51.561992, pinkreader: false, lines: 'Metropolitan, Piccadilly', zone: '6' },
+    { fullname: 'Imperial Wharf Rail Station', name: 'Imperial Wharf', mininame: 'Imper...', longitude: -0.182823, latitude: 51.474949, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Island Gardens DLR Station', name: 'Island Gardens', mininame: 'Islan...', longitude: -0.010139, latitude: 51.487811, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Kennington Underground Station', name: 'Kennington', mininame: 'Kenni...', longitude: -0.105963, latitude: 51.488337, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Kensal Green Rail Station', name: 'Kensal Green', mininame: 'Kensa...', longitude: -0.225088, latitude: 51.53054, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Kensal Green Underground Station', name: 'Kensal Green', mininame: 'Kensa...', longitude: -0.225016, latitude: 51.530539, pinkreader: false, lines: 'Bakerloo', zone: '2' },
+    { fullname: 'Kensal Rise Rail Station', name: 'Kensal Rise', mininame: 'Kensa...', longitude: -0.219957, latitude: 51.534554, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Kensington (Olympia) Rail Station', name: 'Kensington (Olympia)', mininame: 'Kensi...', longitude: -0.210364, latitude: 51.497899, pinkreader: true, lines: 'London Overground', zone: '2' },
+    { fullname: 'Kensington (Olympia) Underground Station', name: 'Kensington (Olympia)', mininame: 'Kensi...', longitude: -0.210015, latitude: 51.497624, pinkreader: false, lines: 'District', zone: '2' },
+    { fullname: 'Kentish Town Underground Station', name: 'Kentish Town', mininame: 'Kenti...', longitude: -0.140733, latitude: 51.550312, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Kentish Town West Rail Station', name: 'Kentish Town West', mininame: 'Kenti...', longitude: -0.146655, latitude: 51.546548, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Kenton Rail Station', name: 'Kenton', mininame: 'Kento...', longitude: -0.316981, latitude: 51.581802, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Kenton Underground Station', name: 'Kenton', mininame: 'Kento...', longitude: -0.31691, latitude: 51.581756, pinkreader: false, lines: 'Bakerloo', zone: '4' },
+    { fullname: 'Kew Gardens Rail Station', name: 'Kew Gardens', mininame: 'Kew G...', longitude: -0.285054, latitude: 51.477073, pinkreader: false, lines: 'London Overground', zone: '3+4' },
+    { fullname: 'Kew Gardens Underground Station', name: 'Kew Gardens', mininame: 'Kew G...', longitude: -0.285241, latitude: 51.477058, pinkreader: false, lines: 'District', zone: '3+4' },
+    { fullname: 'Kilburn High Road Rail Station', name: 'Kilburn High Road', mininame: 'Kilbu...', longitude: -0.192237, latitude: 51.537277, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Kilburn Park Underground Station', name: 'Kilburn Park', mininame: 'Kilbu...', longitude: -0.194232, latitude: 51.534979, pinkreader: false, lines: 'Bakerloo', zone: '2' },
+    { fullname: 'Kilburn Underground Station', name: 'Kilburn', mininame: 'Kilbu...', longitude: -0.204105, latitude: 51.546803, pinkreader: false, lines: 'Jubilee', zone: '2' },
+    { fullname: 'King George V DLR Station', name: 'King George V', mininame: 'King ...', longitude: 0.062624, latitude: 51.502003, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'King&#39;s Cross St. Pancras Underground Station', name: 'King&#39;s Cross St. Pancras', mininame: 'King&...', longitude: -0.123194, latitude: 51.530663, pinkreader: false, lines: 'Circle, Hammersmith & City, Metropolitan, Northern, Piccadilly, Victoria', zone: '1' },
+    { fullname: 'Kingsbury Underground Station', name: 'Kingsbury', mininame: 'Kings...', longitude: -0.27879, latitude: 51.584845, pinkreader: false, lines: 'Jubilee', zone: '4' },
+    { fullname: 'Knightsbridge Underground Station', name: 'Knightsbridge', mininame: 'Knigh...', longitude: -0.160508, latitude: 51.501669, pinkreader: false, lines: 'Piccadilly', zone: '1' },
+    { fullname: 'Ladbroke Grove Underground Station', name: 'Ladbroke Grove', mininame: 'Ladbr...', longitude: -0.210391, latitude: 51.517449, pinkreader: false, lines: 'Circle, Hammersmith & City', zone: '2' },
+    { fullname: 'Lambeth North Underground Station', name: 'Lambeth North', mininame: 'Lambe...', longitude: -0.112315, latitude: 51.498808, pinkreader: false, lines: 'Bakerloo', zone: '1' },
+    { fullname: 'Lancaster Gate Underground Station', name: 'Lancaster Gate', mininame: 'Lanca...', longitude: -0.175494, latitude: 51.511723, pinkreader: false, lines: 'Central', zone: '1' },
+    { fullname: 'Langdon Park DLR Station', name: 'Langdon Park', mininame: 'Langd...', longitude: -0.01415, latitude: 51.515172, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Latimer Road Underground Station', name: 'Latimer Road', mininame: 'Latim...', longitude: -0.217799, latitude: 51.513389, pinkreader: false, lines: 'Circle, Hammersmith & City', zone: '2' },
+    { fullname: 'Leicester Square Underground Station', name: 'Leicester Square', mininame: 'Leice...', longitude: -0.128426, latitude: 51.511386, pinkreader: false, lines: 'Northern, Piccadilly', zone: '1' },
+    { fullname: 'Lewisham DLR Station', name: 'Lewisham', mininame: 'Lewis...', longitude: -0.012874, latitude: 51.464665, pinkreader: false, lines: 'DLR', zone: '2+3' },
+    { fullname: 'Leyton Midland Road Rail Station', name: 'Leyton Midland Road', mininame: 'Leyto...', longitude: -0.008051, latitude: 51.569725, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Leyton Underground Station', name: 'Leyton', mininame: 'Leyto...', longitude: -0.005523, latitude: 51.556589, pinkreader: false, lines: 'Central', zone: '3' },
+    { fullname: 'Leytonstone High Road Rail Station', name: 'Leytonstone High Road', mininame: 'Leyto...', longitude: 0.008416, latitude: 51.563554, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Leytonstone Underground Station', name: 'Leytonstone', mininame: 'Leyto...', longitude: 0.008194, latitude: 51.568324, pinkreader: false, lines: 'Central', zone: '3+4' },
+    { fullname: 'Limehouse DLR Station', name: 'Limehouse', mininame: 'Limeh...', longitude: -0.039809, latitude: 51.512393, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Liverpool Street Underground Station', name: 'Liverpool Street', mininame: 'Liver...', longitude: -0.083182, latitude: 51.517372, pinkreader: false, lines: 'Central, Circle, Hammersmith & City, Metropolitan', zone: '1' },
+    { fullname: 'London Bridge Underground Station', name: 'London Bridge', mininame: 'Londo...', longitude: -0.088873, latitude: 51.505721, pinkreader: false, lines: 'Jubilee, Northern', zone: '1' },
+    { fullname: 'London City Airport DLR Station', name: 'London City Airport', mininame: 'Londo...', longitude: 0.048739, latitude: 51.503416, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'London Euston Rail Station', name: 'London Euston', mininame: 'Londo...', longitude: -0.133924, latitude: 51.528136, pinkreader: false, lines: 'London Overground', zone: '1' },
+    { fullname: 'London Fields Rail Station', name: 'London Fields', mininame: 'Londo...', longitude: -0.057753, latitude: 51.541153, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'London Liverpool Street Rail Station', name: 'London Liverpool Street', mininame: 'Londo...', longitude: -0.081426, latitude: 51.517991, pinkreader: false, lines: 'London Overground', zone: '1' },
+    { fullname: 'Loughton Underground Station', name: 'Loughton', mininame: 'Lough...', longitude: 0.055476, latitude: 51.641443, pinkreader: false, lines: 'Central', zone: '6' },
+    { fullname: 'Maida Vale Underground Station', name: 'Maida Vale', mininame: 'Maida...', longitude: -0.185758, latitude: 51.529777, pinkreader: false, lines: 'Bakerloo', zone: '2' },
+    { fullname: 'Manor House Underground Station', name: 'Manor House', mininame: 'Manor...', longitude: -0.096118, latitude: 51.570738, pinkreader: false, lines: 'Piccadilly', zone: '2+3' },
+    { fullname: 'Mansion House Underground Station', name: 'Mansion House', mininame: 'Mansi...', longitude: -0.094009, latitude: 51.512117, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'Marble Arch Underground Station', name: 'Marble Arch', mininame: 'Marbl...', longitude: -0.158953, latitude: 51.513424, pinkreader: false, lines: 'Central', zone: '1' },
+    { fullname: 'Marylebone Underground Station', name: 'Marylebone', mininame: 'Maryl...', longitude: -0.163207, latitude: 51.522322, pinkreader: false, lines: 'Bakerloo', zone: '1' },
+    { fullname: 'Mile End Underground Station', name: 'Mile End', mininame: 'Mile ...', longitude: -0.03364, latitude: 51.525122, pinkreader: false, lines: 'Central, District, Hammersmith & City', zone: '2' },
+    { fullname: 'Mill Hill East Underground Station', name: 'Mill Hill East', mininame: 'Mill ...', longitude: -0.209986, latitude: 51.608229, pinkreader: false, lines: 'Northern', zone: '4' },
+    { fullname: 'Monument Underground Station', name: 'Monument', mininame: 'Monum...', longitude: -0.085969, latitude: 51.5107, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'Moor Park Underground Station', name: 'Moor Park', mininame: 'Moor ...', longitude: -0.432454, latitude: 51.629845, pinkreader: false, lines: 'Metropolitan', zone: '6+7' },
+    { fullname: 'Moorgate Underground Station', name: 'Moorgate', mininame: 'Moorg...', longitude: -0.088322, latitude: 51.518176, pinkreader: false, lines: 'Circle, Hammersmith & City, Metropolitan, Northern', zone: '1' },
+    { fullname: 'Morden Underground Station', name: 'Morden', mininame: 'Morde...', longitude: -0.194839, latitude: 51.402142, pinkreader: false, lines: 'Northern', zone: '4' },
+    { fullname: 'Mornington Crescent Underground Station', name: 'Mornington Crescent', mininame: 'Morni...', longitude: -0.138789, latitude: 51.534679, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Mudchute DLR Station', name: 'Mudchute', mininame: 'Mudch...', longitude: -0.014738, latitude: 51.490704, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Neasden Underground Station', name: 'Neasden', mininame: 'Neasd...', longitude: -0.249837, latitude: 51.553986, pinkreader: false, lines: 'Jubilee', zone: '3' },
+    { fullname: 'New Cross ELL Rail Station', name: 'New Cross ELL', mininame: 'New C...', longitude: -0.032441, latitude: 51.476344, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'New Cross Gate Rail Station', name: 'New Cross Gate', mininame: 'New C...', longitude: -0.040399, latitude: 51.475128, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Newbury Park Underground Station', name: 'Newbury Park', mininame: 'Newbu...', longitude: 0.090004, latitude: 51.575726, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'North Acton Underground Station', name: 'North Acton', mininame: 'North...', longitude: -0.259755, latitude: 51.523524, pinkreader: false, lines: 'Central', zone: '2+3' },
+    { fullname: 'North Ealing Underground Station', name: 'North Ealing', mininame: 'North...', longitude: -0.288868, latitude: 51.517505, pinkreader: false, lines: 'Piccadilly', zone: '3' },
+    { fullname: 'North Greenwich Underground Station', name: 'North Greenwich', mininame: 'North...', longitude: 0.004287, latitude: 51.50047, pinkreader: false, lines: 'Jubilee', zone: '2+3' },
+    { fullname: 'North Harrow Underground Station', name: 'North Harrow', mininame: 'North...', longitude: -0.362408, latitude: 51.584872, pinkreader: false, lines: 'Metropolitan', zone: '5' },
+    { fullname: 'North Wembley Rail Station', name: 'North Wembley', mininame: 'North...', longitude: -0.303984, latitude: 51.562596, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'North Wembley Underground Station', name: 'North Wembley', mininame: 'North...', longitude: -0.304, latitude: 51.562551, pinkreader: false, lines: 'Bakerloo', zone: '4' },
+    { fullname: 'Northfields Underground Station', name: 'Northfields', mininame: 'North...', longitude: -0.314719, latitude: 51.499319, pinkreader: false, lines: 'Piccadilly', zone: '3' },
+    { fullname: 'Northolt Underground Station', name: 'Northolt', mininame: 'North...', longitude: -0.368699, latitude: 51.548236, pinkreader: false, lines: 'Central', zone: '5' },
+    { fullname: 'Northwick Park Underground Station', name: 'Northwick Park', mininame: 'North...', longitude: -0.318056, latitude: 51.578481, pinkreader: false, lines: 'Metropolitan', zone: '4' },
+    { fullname: 'Northwood Hills Underground Station', name: 'Northwood Hills', mininame: 'North...', longitude: -0.409464, latitude: 51.600572, pinkreader: false, lines: 'Metropolitan', zone: '6' },
+    { fullname: 'Northwood Underground Station', name: 'Northwood', mininame: 'North...', longitude: -0.423829, latitude: 51.611053, pinkreader: false, lines: 'Metropolitan', zone: '6' },
+    { fullname: 'Norwood Junction Rail Station', name: 'Norwood Junction', mininame: 'Norwo...', longitude: -0.075221, latitude: 51.397019, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Notting Hill Gate Underground Station', name: 'Notting Hill Gate', mininame: 'Notti...', longitude: -0.196104, latitude: 51.509128, pinkreader: false, lines: 'Central, Circle, District', zone: '1+2' },
+    { fullname: 'Oakwood Underground Station', name: 'Oakwood', mininame: 'Oakwo...', longitude: -0.132182, latitude: 51.647726, pinkreader: false, lines: 'Piccadilly', zone: '5' },
+    { fullname: 'Old Street Underground Station', name: 'Old Street', mininame: 'Old S...', longitude: -0.08777, latitude: 51.525864, pinkreader: false, lines: 'Northern', zone: '1' },
+    { fullname: 'Osterley Underground Station', name: 'Osterley', mininame: 'Oster...', longitude: -0.352224, latitude: 51.481274, pinkreader: false, lines: 'Piccadilly', zone: '4' },
+    { fullname: 'Oval Underground Station', name: 'Oval', mininame: 'Oval ...', longitude: -0.112439, latitude: 51.48185, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Oxford Circus Underground Station', name: 'Oxford Circus', mininame: 'Oxfor...', longitude: -0.141903, latitude: 51.515224, pinkreader: false, lines: 'Bakerloo, Central, Victoria', zone: '1' },
+    { fullname: 'Paddington (H&C Line)-Underground', name: 'Paddington (H&C Line)-Underground', mininame: 'Paddi...', longitude: -0.178306, latitude: 51.518187, pinkreader: false, lines: 'Circle, Hammersmith & City', zone: '1' },
+    { fullname: 'Paddington Underground Station', name: 'Paddington', mininame: 'Paddi...', longitude: -0.175689, latitude: 51.516581, pinkreader: false, lines: 'Bakerloo, Circle, District', zone: '1' },
+    { fullname: 'Park Royal Underground Station', name: 'Park Royal', mininame: 'Park ...', longitude: -0.284341, latitude: 51.527123, pinkreader: false, lines: 'Piccadilly', zone: '3' },
+    { fullname: 'Parsons Green Underground Station', name: 'Parsons Green', mininame: 'Parso...', longitude: -0.20117, latitude: 51.475277, pinkreader: false, lines: 'District', zone: '2' },
+    { fullname: 'Peckham Rye Rail Station', name: 'Peckham Rye', mininame: 'Peckh...', longitude: -0.069414, latitude: 51.470034, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Penge West Rail Station', name: 'Penge West', mininame: 'Penge...', longitude: -0.06084, latitude: 51.417555, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Perivale Underground Station', name: 'Perivale', mininame: 'Periv...', longitude: -0.323446, latitude: 51.536717, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Piccadilly Circus Underground Station', name: 'Piccadilly Circus', mininame: 'Picca...', longitude: -0.133798, latitude: 51.51005, pinkreader: false, lines: 'Bakerloo, Piccadilly', zone: '1' },
+    { fullname: 'Pimlico Underground Station', name: 'Pimlico', mininame: 'Pimli...', longitude: -0.133761, latitude: 51.489097, pinkreader: false, lines: 'Victoria', zone: '1' },
+    { fullname: 'Pinner Underground Station', name: 'Pinner', mininame: 'Pinne...', longitude: -0.381161, latitude: 51.592901, pinkreader: false, lines: 'Metropolitan', zone: '5' },
+    { fullname: 'Plaistow Underground Station', name: 'Plaistow', mininame: 'Plais...', longitude: 0.017451, latitude: 51.531341, pinkreader: false, lines: 'District, Hammersmith & City', zone: '3' },
+    { fullname: 'Pontoon Dock DLR Station', name: 'Pontoon Dock', mininame: 'Ponto...', longitude: 0.032115, latitude: 51.502212, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Poplar DLR Station', name: 'Poplar', mininame: 'Popla...', longitude: -0.017384, latitude: 51.507744, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Preston Road Underground Station', name: 'Preston Road', mininame: 'Prest...', longitude: -0.295107, latitude: 51.571972, pinkreader: false, lines: 'Metropolitan', zone: '4' },
+    { fullname: 'Prince Regent DLR Station', name: 'Prince Regent', mininame: 'Princ...', longitude: 0.034158, latitude: 51.509263, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Pudding Mill Lane DLR Station', name: 'Pudding Mill Lane', mininame: 'Puddi...', longitude: -0.012755, latitude: 51.534302, pinkreader: false, lines: 'DLR', zone: '2+3' },
+    { fullname: 'Putney Bridge Underground Station', name: 'Putney Bridge', mininame: 'Putne...', longitude: -0.208731, latitude: 51.468262, pinkreader: false, lines: 'District', zone: '2' },
+    { fullname: 'Queen&#39;s Park Underground Station', name: 'Queen&#39;s Park', mininame: 'Queen...', longitude: -0.204574, latitude: 51.534158, pinkreader: false, lines: 'Bakerloo', zone: '2' },
+    { fullname: 'Queens Park (London) Rail Station', name: 'Queens Park (London)', mininame: 'Queen...', longitude: -0.204985, latitude: 51.533966, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Queens Road Peckham Rail Station', name: 'Queens Road Peckham', mininame: 'Queen...', longitude: -0.057313, latitude: 51.473566, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Queensbury Underground Station', name: 'Queensbury', mininame: 'Queen...', longitude: -0.286219, latitude: 51.594188, pinkreader: false, lines: 'Jubilee', zone: '4' },
+    { fullname: 'Queensway Underground Station', name: 'Queensway', mininame: 'Queen...', longitude: -0.187152, latitude: 51.510312, pinkreader: false, lines: 'Central', zone: '1' },
+    { fullname: 'Ravenscourt Park Underground Station', name: 'Ravenscourt Park', mininame: 'Raven...', longitude: -0.235881, latitude: 51.494122, pinkreader: false, lines: 'District, Piccadilly', zone: '2' },
+    { fullname: 'Rayners Lane Underground Station', name: 'Rayners Lane', mininame: 'Rayne...', longitude: -0.371127, latitude: 51.575147, pinkreader: true, lines: 'Metropolitan, Piccadilly', zone: '5' },
+    { fullname: 'Rectory Road Rail Station', name: 'Rectory Road', mininame: 'Recto...', longitude: -0.068267, latitude: 51.558502, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Redbridge Underground Station', name: 'Redbridge', mininame: 'Redbr...', longitude: 0.04536, latitude: 51.576243, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Regent&#39;s Park Underground Station', name: 'Regent&#39;s Park', mininame: 'Regen...', longitude: -0.146444, latitude: 51.523344, pinkreader: false, lines: 'Bakerloo', zone: '1' },
+    { fullname: 'Richmond (London) Rail Station', name: 'Richmond (London)', mininame: 'Richm...', longitude: -0.301558, latitude: 51.463061, pinkreader: true, lines: 'London Overground', zone: '4' },
+    { fullname: 'Richmond Underground Station', name: 'Richmond', mininame: 'Richm...', longitude: -0.301336, latitude: 51.463237, pinkreader: false, lines: 'District', zone: '4' },
+    { fullname: 'Rickmansworth Underground Station', name: 'Rickmansworth', mininame: 'Rickm...', longitude: -0.473703, latitude: 51.640207, pinkreader: false, lines: 'Metropolitan', zone: '7' },
+    { fullname: 'Roding Valley Underground Station', name: 'Roding Valley', mininame: 'Rodin...', longitude: 0.043647, latitude: 51.617199, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Romford Rail Station', name: 'Romford', mininame: 'Romfo...', longitude: 0.183237, latitude: 51.574829, pinkreader: false, lines: 'London Overground', zone: '6' },
+    { fullname: 'Rotherhithe Rail Station', name: 'Rotherhithe', mininame: 'Rothe...', longitude: -0.052048, latitude: 51.500817, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Royal Albert DLR Station', name: 'Royal Albert', mininame: 'Royal...', longitude: 0.045935, latitude: 51.508357, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Royal Oak Underground Station', name: 'Royal Oak', mininame: 'Royal...', longitude: -0.188748, latitude: 51.519113, pinkreader: false, lines: 'Circle, Hammersmith & City', zone: '2' },
+    { fullname: 'Royal Victoria DLR Station', name: 'Royal Victoria', mininame: 'Royal...', longitude: 0.018497, latitude: 51.509336, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Ruislip Gardens Underground Station', name: 'Ruislip Gardens', mininame: 'Ruisl...', longitude: -0.41071, latitude: 51.560736, pinkreader: false, lines: 'Central', zone: '5' },
+    { fullname: 'Ruislip Manor Underground Station', name: 'Ruislip Manor', mininame: 'Ruisl...', longitude: -0.412973, latitude: 51.573202, pinkreader: false, lines: 'Metropolitan, Piccadilly', zone: '6' },
+    { fullname: 'Ruislip Underground Station', name: 'Ruislip', mininame: 'Ruisl...', longitude: -0.421898, latitude: 51.571354, pinkreader: false, lines: 'Metropolitan, Piccadilly', zone: '6' },
+    { fullname: 'Russell Square Underground Station', name: 'Russell Square', mininame: 'Russe...', longitude: -0.124285, latitude: 51.523073, pinkreader: false, lines: 'Piccadilly', zone: '1' },
+    { fullname: 'Seven Sisters Rail Station', name: 'Seven Sisters', mininame: 'Seven...', longitude: -0.07527, latitude: 51.582268, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Seven Sisters Underground Station', name: 'Seven Sisters', mininame: 'Seven...', longitude: -0.072584, latitude: 51.58333, pinkreader: false, lines: 'Victoria', zone: '3' },
+    { fullname: 'Shadwell DLR Station', name: 'Shadwell', mininame: 'Shadw...', longitude: -0.056643, latitude: 51.511693, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Shadwell Rail Station', name: 'Shadwell', mininame: 'Shadw...', longitude: -0.056934, latitude: 51.511284, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Shepherd&#39;s Bush (Central) Underground Station', name: 'Shepherd&#39;s Bush (Central)', mininame: 'Sheph...', longitude: -0.218813, latitude: 51.504376, pinkreader: false, lines: 'Central', zone: '2' },
+    { fullname: 'Shepherd&#39;s Bush Market Underground Station', name: 'Shepherd&#39;s Bush Market', mininame: 'Sheph...', longitude: -0.226375, latitude: 51.505579, pinkreader: false, lines: 'Circle, Hammersmith & City', zone: '2' },
+    { fullname: 'Shepherds Bush Rail Station', name: 'Shepherds Bush', mininame: 'Sheph...', longitude: -0.217654, latitude: 51.505285, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Shoreditch High Street Rail Station', name: 'Shoreditch High Street', mininame: 'Shore...', longitude: -0.075246, latitude: 51.523375, pinkreader: false, lines: 'London Overground', zone: '1' },
+    { fullname: 'Silver Street Rail Station', name: 'Silver Street', mininame: 'Silve...', longitude: -0.06724, latitude: 51.614688, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Sloane Square Underground Station', name: 'Sloane Square', mininame: 'Sloan...', longitude: -0.156377, latitude: 51.49227, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'Snaresbrook Underground Station', name: 'Snaresbrook', mininame: 'Snare...', longitude: 0.02144, latitude: 51.580678, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'South Acton Rail Station', name: 'South Acton', mininame: 'South...', longitude: -0.270157, latitude: 51.499695, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'South Ealing Underground Station', name: 'South Ealing', mininame: 'South...', longitude: -0.307424, latitude: 51.501003, pinkreader: false, lines: 'Piccadilly', zone: '3' },
+    { fullname: 'South Hampstead Rail Station', name: 'South Hampstead', mininame: 'South...', longitude: -0.178878, latitude: 51.541432, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'South Harrow Underground Station', name: 'South Harrow', mininame: 'South...', longitude: -0.352492, latitude: 51.564888, pinkreader: false, lines: 'Piccadilly', zone: '5' },
+    { fullname: 'South Kensington Underground Station', name: 'South Kensington', mininame: 'South...', longitude: -0.174138, latitude: 51.494094, pinkreader: false, lines: 'Circle, District, Piccadilly', zone: '1' },
+    { fullname: 'South Kenton Rail Station', name: 'South Kenton', mininame: 'South...', longitude: -0.308462, latitude: 51.570214, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'South Kenton Underground Station', name: 'South Kenton', mininame: 'South...', longitude: -0.308433, latitude: 51.570232, pinkreader: false, lines: 'Bakerloo', zone: '4' },
+    { fullname: 'South Quay DLR Station', name: 'South Quay', mininame: 'South...', longitude: -0.016133, latitude: 51.500053, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'South Ruislip Underground Station', name: 'South Ruislip', mininame: 'South...', longitude: -0.398915, latitude: 51.556853, pinkreader: false, lines: 'Central', zone: '5' },
+    { fullname: 'South Tottenham Rail Station', name: 'South Tottenham', mininame: 'South...', longitude: -0.072103, latitude: 51.580372, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'South Wimbledon Underground Station', name: 'South Wimbledon', mininame: 'South...', longitude: -0.192005, latitude: 51.415309, pinkreader: false, lines: 'Northern', zone: '3+4' },
+    { fullname: 'South Woodford Underground Station', name: 'South Woodford', mininame: 'South...', longitude: 0.027338, latitude: 51.591907, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Southbury Rail Station', name: 'Southbury', mininame: 'South...', longitude: -0.052437, latitude: 51.648705, pinkreader: false, lines: 'London Overground', zone: '5' },
+    { fullname: 'Southfields Underground Station', name: 'Southfields', mininame: 'South...', longitude: -0.206602, latitude: 51.445073, pinkreader: false, lines: 'District', zone: '3' },
+    { fullname: 'Southgate Underground Station', name: 'Southgate', mininame: 'South...', longitude: -0.127816, latitude: 51.632315, pinkreader: false, lines: 'Piccadilly', zone: '4' },
+    { fullname: 'Southwark Underground Station', name: 'Southwark', mininame: 'South...', longitude: -0.10494, latitude: 51.503976, pinkreader: false, lines: 'Jubilee', zone: '1' },
+    { fullname: 'St James Street (London) Rail Station', name: 'St James Street (London)', mininame: 'St Ja...', longitude: -0.032918, latitude: 51.580981, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'St. James&#39;s Park Underground Station', name: 'St. James&#39;s Park', mininame: 'St. J...', longitude: -0.133608, latitude: 51.499544, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'St. John&#39;s Wood Underground Station', name: 'St. John&#39;s Wood', mininame: 'St. J...', longitude: -0.173948, latitude: 51.534521, pinkreader: false, lines: 'Jubilee', zone: '2' },
+    { fullname: 'St. Paul&#39;s Underground Station', name: 'St. Paul&#39;s', mininame: 'St. P...', longitude: -0.097567, latitude: 51.514936, pinkreader: false, lines: 'Central', zone: '1' },
+    { fullname: 'Stamford Brook Underground Station', name: 'Stamford Brook', mininame: 'Stamf...', longitude: -0.245704, latitude: 51.494917, pinkreader: false, lines: 'District, Piccadilly', zone: '2' },
+    { fullname: 'Stamford Hill Rail Station', name: 'Stamford Hill', mininame: 'Stamf...', longitude: -0.076682, latitude: 51.574467, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Stanmore Underground Station', name: 'Stanmore', mininame: 'Stanm...', longitude: -0.303266, latitude: 51.619839, pinkreader: false, lines: 'Jubilee', zone: '5' },
+    { fullname: 'Star Lane DLR Station', name: 'Star Lane', mininame: 'Star ...', longitude: 0.004156, latitude: 51.520786, pinkreader: false, lines: 'DLR', zone: '2/3' },
+    { fullname: 'Stepney Green Underground Station', name: 'Stepney Green', mininame: 'Stepn...', longitude: -0.046596, latitude: 51.521858, pinkreader: false, lines: 'District, Hammersmith & City', zone: '2' },
+    { fullname: 'Stockwell Underground Station', name: 'Stockwell', mininame: 'Stock...', longitude: -0.122644, latitude: 51.472184, pinkreader: false, lines: 'Northern, Victoria', zone: '2' },
+    { fullname: 'Stoke Newington Rail Station', name: 'Stoke Newington', mininame: 'Stoke...', longitude: -0.072887, latitude: 51.565233, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Stonebridge Park Rail Station', name: 'Stonebridge Park', mininame: 'Stone...', longitude: -0.275828, latitude: 51.544111, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Stonebridge Park Underground Station', name: 'Stonebridge Park', mininame: 'Stone...', longitude: -0.275892, latitude: 51.543959, pinkreader: false, lines: 'Bakerloo', zone: '3' },
+    { fullname: 'Stratford (London) Rail Station', name: 'Stratford (London)', mininame: 'Strat...', longitude: -0.003397, latitude: 51.541895, pinkreader: false, lines: 'London Overground', zone: '2/3' },
+    { fullname: 'Stratford DLR Station', name: 'Stratford', mininame: 'Strat...', longitude: -0.003287, latitude: 51.541758, pinkreader: false, lines: 'DLR', zone: '2/3' },
+    { fullname: 'Stratford High Street DLR Station', name: 'Stratford High Street', mininame: 'Strat...', longitude: -0.001078, latitude: 51.538196, pinkreader: false, lines: 'DLR', zone: '2/3' },
+    { fullname: 'Stratford International DLR Station', name: 'Stratford International', mininame: 'Strat...', longitude: -0.009638, latitude: 51.545265, pinkreader: false, lines: 'DLR', zone: '2/3' },
+    { fullname: 'Stratford Underground Station', name: 'Stratford', mininame: 'Strat...', longitude: -0.003458, latitude: 51.541806, pinkreader: false, lines: 'Central, Jubilee', zone: '2/3' },
+    { fullname: 'Sudbury Hill Underground Station', name: 'Sudbury Hill', mininame: 'Sudbu...', longitude: -0.336435, latitude: 51.556946, pinkreader: false, lines: 'Piccadilly', zone: '4' },
+    { fullname: 'Sudbury Town Underground Station', name: 'Sudbury Town', mininame: 'Sudbu...', longitude: -0.315745, latitude: 51.550815, pinkreader: false, lines: 'Piccadilly', zone: '4' },
+    { fullname: 'Surrey Quays Rail Station', name: 'Surrey Quays', mininame: 'Surre...', longitude: -0.047519, latitude: 51.493196, pinkreader: true, lines: 'London Overground', zone: '2' },
+    { fullname: 'Swiss Cottage Underground Station', name: 'Swiss Cottage', mininame: 'Swiss...', longitude: -0.174894, latitude: 51.543681, pinkreader: false, lines: 'Jubilee', zone: '2' },
+    { fullname: 'Sydenham Rail Station', name: 'Sydenham', mininame: 'Syden...', longitude: -0.054244, latitude: 51.427248, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Temple Underground Station', name: 'Temple', mininame: 'Templ...', longitude: -0.11426, latitude: 51.511006, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'Theobalds Grove Rail Station', name: 'Theobalds Grove', mininame: 'Theob...', longitude: -0.034831, latitude: 51.692457, pinkreader: false, lines: 'London Overground', zone: '7' },
+    { fullname: 'Theydon Bois Underground Station', name: 'Theydon Bois', mininame: 'Theyd...', longitude: 0.103085, latitude: 51.671759, pinkreader: false, lines: 'Central', zone: '6' },
+    { fullname: 'Tooting Bec Underground Station', name: 'Tooting Bec', mininame: 'Tooti...', longitude: -0.159736, latitude: 51.435678, pinkreader: false, lines: 'Northern', zone: '3' },
+    { fullname: 'Tooting Broadway Underground Station', name: 'Tooting Broadway', mininame: 'Tooti...', longitude: -0.168374, latitude: 51.42763, pinkreader: false, lines: 'Northern', zone: '3' },
+    { fullname: 'Tottenham Court Road Underground Station', name: 'Tottenham Court Road', mininame: 'Totte...', longitude: -0.13041, latitude: 51.516426, pinkreader: false, lines: 'Central, Northern', zone: '1' },
+    { fullname: 'Tottenham Hale Underground Station', name: 'Tottenham Hale', mininame: 'Totte...', longitude: -0.060241, latitude: 51.588108, pinkreader: false, lines: 'Victoria', zone: '3' },
+    { fullname: 'Totteridge & Whetstone Underground Station', name: 'Totteridge & Whetstone', mininame: 'Totte...', longitude: -0.17921, latitude: 51.630597, pinkreader: false, lines: 'Northern', zone: '4' },
+    { fullname: 'Tower Gateway DLR Station', name: 'Tower Gateway', mininame: 'Tower...', longitude: -0.074818, latitude: 51.510617, pinkreader: false, lines: 'DLR', zone: '1' },
+    { fullname: 'Tower Hill Underground Station', name: 'Tower Hill', mininame: 'Tower...', longitude: -0.076546, latitude: 51.509971, pinkreader: false, lines: 'Circle, District', zone: '1' },
+    { fullname: 'Tufnell Park Underground Station', name: 'Tufnell Park', mininame: 'Tufne...', longitude: -0.138433, latitude: 51.556822, pinkreader: false, lines: 'Northern', zone: '2' },
+    { fullname: 'Turkey Street Rail Station', name: 'Turkey Street', mininame: 'Turke...', longitude: -0.047217, latitude: 51.672628, pinkreader: false, lines: 'London Overground', zone: '6' },
+    { fullname: 'Turnham Green Underground Station', name: 'Turnham Green', mininame: 'Turnh...', longitude: -0.254555, latitude: 51.495148, pinkreader: false, lines: 'District, Piccadilly', zone: '2' },
+    { fullname: 'Turnpike Lane Underground Station', name: 'Turnpike Lane', mininame: 'Turnp...', longitude: -0.102953, latitude: 51.590272, pinkreader: false, lines: 'Piccadilly', zone: '3' },
+    { fullname: 'Upminster Bridge Underground Station', name: 'Upminster Bridge', mininame: 'Upmin...', longitude: 0.235809, latitude: 51.55856, pinkreader: false, lines: 'District', zone: '6' },
+    { fullname: 'Upminster Rail Station', name: 'Upminster', mininame: 'Upmin...', longitude: 0.25088, latitude: 51.559018, pinkreader: false, lines: 'London Overground', zone: '6' },
+    { fullname: 'Upminster Underground Station', name: 'Upminster', mininame: 'Upmin...', longitude: 0.250882, latitude: 51.559063, pinkreader: false, lines: 'District', zone: '6' },
+    { fullname: 'Upney Underground Station', name: 'Upney', mininame: 'Upney...', longitude: 0.10153, latitude: 51.538372, pinkreader: false, lines: 'District', zone: '4' },
+    { fullname: 'Upper Holloway Rail Station', name: 'Upper Holloway', mininame: 'Upper...', longitude: -0.129513, latitude: 51.563631, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Upton Park Underground Station', name: 'Upton Park', mininame: 'Upton...', longitude: 0.035263, latitude: 51.53534, pinkreader: false, lines: 'District, Hammersmith & City', zone: '3' },
+    { fullname: 'Uxbridge Underground Station', name: 'Uxbridge', mininame: 'Uxbri...', longitude: -0.477949, latitude: 51.546565, pinkreader: false, lines: 'Metropolitan, Piccadilly', zone: '6' },
+    { fullname: 'Vauxhall Underground Station', name: 'Vauxhall', mininame: 'Vauxh...', longitude: -0.124204, latitude: 51.485743, pinkreader: false, lines: 'Victoria', zone: '1+2' },
+    { fullname: 'Victoria Underground Station', name: 'Victoria', mininame: 'Victo...', longitude: -0.143102, latitude: 51.496359, pinkreader: false, lines: 'Circle, District, Victoria', zone: '1' },
+    { fullname: 'Walthamstow Central Rail Station', name: 'Walthamstow Central', mininame: 'Walth...', longitude: -0.019815, latitude: 51.582919, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Walthamstow Central Underground Station', name: 'Walthamstow Central', mininame: 'Walth...', longitude: -0.019885, latitude: 51.582965, pinkreader: false, lines: 'Victoria', zone: '3' },
+    { fullname: 'Walthamstow Queens Road Rail Station', name: 'Walthamstow Queens Road', mininame: 'Walth...', longitude: -0.023846, latitude: 51.581503, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Wandsworth Road Rail Station', name: 'Wandsworth Road', mininame: 'Wands...', longitude: -0.13852, latitude: 51.470216, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Wanstead Park Rail Station', name: 'Wanstead Park', mininame: 'Wanst...', longitude: 0.026213, latitude: 51.551693, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Wanstead Underground Station', name: 'Wanstead', mininame: 'Wanst...', longitude: 0.028527, latitude: 51.575501, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Wapping Rail Station', name: 'Wapping', mininame: 'Wappi...', longitude: -0.055931, latitude: 51.504388, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'Warren Street Underground Station', name: 'Warren Street', mininame: 'Warre...', longitude: -0.138321, latitude: 51.524951, pinkreader: false, lines: 'Northern, Victoria', zone: '1' },
+    { fullname: 'Warwick Avenue Underground Station', name: 'Warwick Avenue', mininame: 'Warwi...', longitude: -0.183783, latitude: 51.523263, pinkreader: false, lines: 'Bakerloo', zone: '2' },
+    { fullname: 'Waterloo Underground Station', name: 'Waterloo', mininame: 'Water...', longitude: -0.11478, latitude: 51.503299, pinkreader: false, lines: 'Bakerloo, Jubilee, Northern, Waterloo & City', zone: '1' },
+    { fullname: 'Wembley Central Rail Station', name: 'Wembley Central', mininame: 'Wembl...', longitude: -0.296433, latitude: 51.552325, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Wembley Central Underground Station', name: 'Wembley Central', mininame: 'Wembl...', longitude: -0.296852, latitude: 51.552304, pinkreader: false, lines: 'Bakerloo', zone: '4' },
+    { fullname: 'Wembley Park Underground Station', name: 'Wembley Park', mininame: 'Wembl...', longitude: -0.279262, latitude: 51.563198, pinkreader: false, lines: 'Jubilee, Metropolitan', zone: '4' },
+    { fullname: 'West Acton Underground Station', name: 'West Acton', mininame: 'West ...', longitude: -0.28098, latitude: 51.518001, pinkreader: false, lines: 'Central', zone: '3' },
+    { fullname: 'West Brompton Rail Station', name: 'West Brompton', mininame: 'West ...', longitude: -0.195593, latitude: 51.487061, pinkreader: true, lines: 'London Overground', zone: '2' },
+    { fullname: 'West Brompton Underground Station', name: 'West Brompton', mininame: 'West ...', longitude: -0.195599, latitude: 51.487268, pinkreader: false, lines: 'District', zone: '2' },
+    { fullname: 'West Croydon Rail Station', name: 'West Croydon', mininame: 'West ...', longitude: -0.102585, latitude: 51.378428, pinkreader: false, lines: 'London Overground', zone: '5' },
+    { fullname: 'West Finchley Underground Station', name: 'West Finchley', mininame: 'West ...', longitude: -0.188362, latitude: 51.609426, pinkreader: false, lines: 'Northern', zone: '4' },
+    { fullname: 'West Ham DLR Station', name: 'West Ham', mininame: 'West ...', longitude: 0.004482, latitude: 51.527894, pinkreader: false, lines: 'DLR', zone: '2/3' },
+    { fullname: 'West Ham Underground Station', name: 'West Ham', mininame: 'West ...', longitude: 0.005055, latitude: 51.528136, pinkreader: false, lines: 'District, Hammersmith & City, Jubilee', zone: '2/3' },
+    { fullname: 'West Hampstead Rail Station', name: 'West Hampstead', mininame: 'West ...', longitude: -0.191185, latitude: 51.547468, pinkreader: false, lines: 'London Overground', zone: '2' },
+    { fullname: 'West Hampstead Underground Station', name: 'West Hampstead', mininame: 'West ...', longitude: -0.191059, latitude: 51.546638, pinkreader: false, lines: 'Jubilee', zone: '2' },
+    { fullname: 'West Harrow Underground Station', name: 'West Harrow', mininame: 'West ...', longitude: -0.3534, latitude: 51.57971, pinkreader: false, lines: 'Metropolitan', zone: '5' },
+    { fullname: 'West India Quay DLR Station', name: 'West India Quay', mininame: 'West ...', longitude: -0.020311, latitude: 51.50703, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'West Kensington Underground Station', name: 'West Kensington', mininame: 'West ...', longitude: -0.206636, latitude: 51.490459, pinkreader: false, lines: 'District', zone: '2' },
+    { fullname: 'West Ruislip Underground Station', name: 'West Ruislip', mininame: 'West ...', longitude: -0.437886, latitude: 51.569688, pinkreader: false, lines: 'Central', zone: '6' },
+    { fullname: 'West Silvertown DLR Station', name: 'West Silvertown', mininame: 'West ...', longitude: 0.02246, latitude: 51.502838, pinkreader: false, lines: 'DLR', zone: '3' },
+    { fullname: 'Westbourne Park Underground Station', name: 'Westbourne Park', mininame: 'Westb...', longitude: -0.201065, latitude: 51.52111, pinkreader: false, lines: 'Circle, Hammersmith & City', zone: '2' },
+    { fullname: 'Westferry DLR Station', name: 'Westferry', mininame: 'Westf...', longitude: -0.02675, latitude: 51.509431, pinkreader: false, lines: 'DLR', zone: '2' },
+    { fullname: 'Westminster Underground Station', name: 'Westminster', mininame: 'Westm...', longitude: -0.124861, latitude: 51.50132, pinkreader: false, lines: 'Circle, District, Jubilee', zone: '1' },
+    { fullname: 'White City Underground Station', name: 'White City', mininame: 'White...', longitude: -0.224297, latitude: 51.511959, pinkreader: false, lines: 'Central', zone: '2' },
+    { fullname: 'White Hart Lane Rail Station', name: 'White Hart Lane', mininame: 'White...', longitude: -0.070914, latitude: 51.605037, pinkreader: false, lines: 'London Overground', zone: '3' },
+    { fullname: 'Whitechapel Rail Station', name: 'Whitechapel', mininame: 'White...', longitude: -0.059757, latitude: 51.519469, pinkreader: true, lines: 'London Overground', zone: '2' },
+    { fullname: 'Whitechapel Underground Station', name: 'Whitechapel', mininame: 'White...', longitude: -0.059971, latitude: 51.519518, pinkreader: false, lines: 'District, Hammersmith & City', zone: '2' },
+    { fullname: 'Willesden Green Underground Station', name: 'Willesden Green', mininame: 'Wille...', longitude: -0.221537, latitude: 51.549146, pinkreader: false, lines: 'Jubilee, Metropolitan', zone: '2+3' },
+    { fullname: 'Willesden Junction Rail Station', name: 'Willesden Junction', mininame: 'Wille...', longitude: -0.244548, latitude: 51.532497, pinkreader: true, lines: 'London Overground', zone: '2+3' },
+    { fullname: 'Willesden Junction Underground Station', name: 'Willesden Junction', mininame: 'Wille...', longitude: -0.244283, latitude: 51.532259, pinkreader: false, lines: 'Bakerloo', zone: '2+3' },
+    { fullname: 'Wimbledon Park Underground Station', name: 'Wimbledon Park', mininame: 'Wimbl...', longitude: -0.199719, latitude: 51.434573, pinkreader: false, lines: 'District', zone: '3' },
+    { fullname: 'Wimbledon Underground Station', name: 'Wimbledon', mininame: 'Wimbl...', longitude: -0.206573, latitude: 51.421207, pinkreader: true, lines: 'District', zone: '3' },
+    { fullname: 'Wood Green Underground Station', name: 'Wood Green', mininame: 'Wood ...', longitude: -0.109886, latitude: 51.597479, pinkreader: false, lines: 'Piccadilly', zone: '3' },
+    { fullname: 'Wood Lane Underground Station', name: 'Wood Lane', mininame: 'Wood ...', longitude: -0.22453, latitude: 51.509669, pinkreader: false, lines: 'Circle, Hammersmith & City', zone: '2' },
+    { fullname: 'Wood Street Rail Station', name: 'Wood Street', mininame: 'Wood ...', longitude: -0.002405, latitude: 51.58658, pinkreader: false, lines: 'London Overground', zone: '4' },
+    { fullname: 'Woodford Underground Station', name: 'Woodford', mininame: 'Woodf...', longitude: 0.03397, latitude: 51.606899, pinkreader: false, lines: 'Central', zone: '4' },
+    { fullname: 'Woodgrange Park Rail Station', name: 'Woodgrange Park', mininame: 'Woodg...', longitude: 0.044423, latitude: 51.549264, pinkreader: false, lines: 'London Overground', zone: '3+4' },
+    { fullname: 'Woodside Park Underground Station', name: 'Woodside Park', mininame: 'Woods...', longitude: -0.18542, latitude: 51.618014, pinkreader: false, lines: 'Northern', zone: '4' },
+    { fullname: 'Woolwich Arsenal DLR Station', name: 'Woolwich Arsenal', mininame: 'Woolw...', longitude: 0.069127, latitude: 51.490009, pinkreader: false, lines: 'DLR', zone: '4' },
+    ];
+
+    let stationsZ15 = stations.filter(Z15 => { return !['6', '6+7', '7', '8', '9'].includes(Z15.zone) });
+
+    stationsZ15.forEach(function (station, index) {
+
+        //L.marker([station.latitude, station.longitude]).addTo(mymap);
+        var myIcon = L.divIcon({
+            className: `station-icon zone${station.zone} ${station.lines.replace(",", "").replace("&", "").toLowerCase()} pinkreader-${station.pinkreader} line-${(station.lines.indexOf(',') > -1) ? 'interchange' : station.lines.replace(/\s/g, "-").toLowerCase()}`,
+            html: `<div class="station-label zone${station.zone}"><span class='fullname'>${station.fullname}</span><span class='name'>${station.name}</span><span class='mininame'>${station.mininame}</span></div>`
+        });
+
+        // you can set .my-div-icon styles in CSS
+        L.marker([station.latitude, station.longitude], { icon: myIcon }).addTo(mymap)
+            .on('click', logText, { capture: false, once: true })
+            .bindPopup(`<b>${station.fullname}</b><br/><br/><b>Line(s): ${station.lines}</b><br/><b>Zone: ${station.zone}</b>${station.pinkreader ? "<br/><br/><i>There is a <a href='https://tfl.gov.uk/fares-and-payments/oyster/using-oyster/pink-card-readers'>pink reader</a> at this station.</i>" : ""}`);
+    });
+
+
+
+    let counter = 0;
+
+    function logText(e) {
+        console.log(`[${e.target.getLatLng().lat}, ${e.target.getLatLng().lng}],`);
+        counter++;
+    }
+
+
+
+    var polyNorthernBarnetBranch = [
+        [51.650541, -0.194298],
+        [51.630597, -0.17921],
+        [51.618014, -0.18542],
+        [51.609426, -0.188362],
+        [51.600921, -0.192527],
+        [51.587131, -0.165012],
+        [51.577532, -0.145857],
+        [51.565478, -0.134819],
+        [51.556822, -0.138433],
+        [51.550312, -0.140733],
+        [51.539292, -0.14274],
+    ];
+
+    var polyNorthernMillHillBranch = [
+        [51.608229, -0.209986],
+        [51.600921, -0.192527],
+    ];
+
+    var polyNorthernCharingCrossBranch = [
+        [51.539292, -0.14274],
+        [51.534679, -0.138789],
+        [51.528344, -0.1323],
+        [51.524951, -0.138321],
+        [51.520599, -0.134361],
+        [51.516426, -0.13041],
+        [51.511386, -0.128426],
+        [51.50741, -0.127277],
+        [51.507058, -0.122666],
+        [51.503299, -0.11478],
+        [51.488337, -0.105963],
+    ];
+
+    var polyNorthernBankBranch = [
+        [51.539292, -0.14274],
+        [51.528344, -0.1323],
+        [51.530663, -0.123194],
+        [51.532796, -0.105992],
+        [51.525864, -0.08777],
+        [51.518176, -0.088322],
+        [51.512751, -0.088204],
+        [51.505721, -0.088873],
+        [51.501199, -0.09337],
+        [51.494536, -0.100606],
+        [51.488337, -0.105963],
+    ];
+
+    var polyNorthernMorden = [
+        [51.488337, -0.105963],
+        [51.48185, -0.112439],
+        [51.472184, -0.122644],
+        [51.465135, -0.130016],
+        [51.461742, -0.138317],
+        [51.452654, -0.147582],
+        [51.443288, -0.152997],
+        [51.435678, -0.159736],
+        [51.42763, -0.168374],
+        [51.41816, -0.178086],
+        [51.415309, -0.192005],
+        [51.402142, -0.194839],
+    ];
+
+    var polyNorthernEdgeware = [
+        [51.613653, -0.274928],
+        [51.602774, -0.264048],
+        [51.595424, -0.249919],
+        [51.583301, -0.226424],
+        [51.57665, -0.213622],
+        [51.572259, -0.194039],
+        [51.556632, -0.178487],
+        [51.550311, -0.164648],
+        [51.544118, -0.153388],
+        [51.539292, -0.14274],
+    ];
+
+
+
+    var polyPiccadillyHeathrow = [
+        [51.65152, -0.149171],
+        [51.647726, -0.132182],
+        [51.632315, -0.127816],
+        [51.616446, -0.133062],
+        [51.607034, -0.124235],
+        [51.597479, -0.109886],
+        [51.590272, -0.102953],
+        [51.570738, -0.096118],
+        [51.564158, -0.106825],
+        [51.558655, -0.107457],
+        [51.552697, -0.113244],
+        [51.548519, -0.118493],
+        [51.530663, -0.123194],
+        [51.523073, -0.124285],
+        [51.51758, -0.120475],
+        [51.513093, -0.124436],
+        [51.511386, -0.128426],
+        [51.51005, -0.133798],
+        [51.506947, -0.142787],
+        [51.503035, -0.152441],
+        [51.501669, -0.160508],
+        [51.494094, -0.174138],
+        [51.494316, -0.182658],
+        [51.492063, -0.193378],
+        [51.490311, -0.213427],
+        [51.4923, -0.22362],
+        [51.503057, -0.280462],
+        [51.501003, -0.307424],
+        [51.499319, -0.314719],
+        [51.495635, -0.324939],
+        [51.481274, -0.352224],
+        [51.473213, -0.356474],
+        [51.471295, -0.366578],
+        [51.473469, -0.386544],
+        [51.466747, -0.423191],
+    ];
+
+
+    var polyPiccadillyUxbridge = [
+        [51.576506, -0.397373],
+        [51.575147, -0.371127],
+        [51.564888, -0.352492],
+        [51.556946, -0.336435],
+        [51.550815, -0.315745],
+        [51.540627, -0.29961],
+        [51.527123, -0.284341],
+        [51.517505, -0.288868],
+        [51.51014, -0.288265],
+        [51.503057, -0.280462],
+    ];
+
+
+    var polyJubilee = [
+        [51.619839, -0.303266],
+        [51.607701, -0.294693],
+        [51.594188, -0.286219],
+        [51.584845, -0.27879],
+        [51.563198, -0.279262],
+        [51.553986, -0.249837],
+        [51.551955, -0.239068],
+        [51.549146, -0.221537],
+        [51.546803, -0.204105],
+        [51.546638, -0.191059],
+        [51.546825, -0.179845],
+        [51.543681, -0.174894],
+        [51.534521, -0.173948],
+        [51.522883, -0.15713],
+        [51.514304, -0.149723],
+        [51.506947, -0.142787],
+        [51.50132, -0.124861],
+        [51.503299, -0.11478],
+        [51.503976, -0.10494],
+        [51.505721, -0.088873],
+        [51.497953, -0.063769],
+        [51.497945, -0.049722],
+        [51.497945, -0.049722],
+        [51.503488, -0.018246],
+        [51.50047, 0.004287],
+        [51.513584, 0.008322],
+        [51.528136, 0.005055],
+        [51.541806, -0.003458],
+    ];
+
+
+    var polyMetropolitanAmershamAldgate = [
+        [51.592901, -0.381161],
+        [51.584872, -0.362408],
+        [51.579195, -0.337225],
+        [51.578481, -0.318056],
+        [51.571972, -0.295107],
+        [51.563198, -0.279262],
+        [51.546825, -0.179845],
+        [51.522883, -0.15713],
+        [51.52384, -0.144262],
+        [51.525604, -0.135829],
+        [51.520252, -0.104913],
+        [51.520275, -0.097993],
+        [51.518176, -0.088322],
+        [51.517372, -0.083182],
+        [51.514246, -0.075689],
+    ];
+
+
+    var polyMetropolitanUxbridgeHarrowOnTheHill = [
+        [51.576506, -0.397373],
+        [51.575147, -0.371127],
+        [51.57971, -0.3534],
+        [51.579195, -0.337225],
+    ];
+
+    var polyCentralWestRuislipBranch = [
+        [51.560736, -0.41071],
+        [51.556853, -0.398915],
+        [51.548236, -0.368699],
+        [51.542424, -0.34605],
+        [51.536717, -0.323446],
+        [51.530177, -0.292704],
+        [51.523524, -0.259755],
+    ];
+
+
+    var polyCentralEalingBroadwayEpping = [
+        [51.515017, -0.301457],
+        [51.518001, -0.28098],
+        [51.523524, -0.259755],
+        [51.516612, -0.247248],
+        [51.511959, -0.224297],
+        [51.504376, -0.218813],
+        [51.507143, -0.205679],
+        [51.509128, -0.196104],
+        [51.510312, -0.187152],
+        [51.511723, -0.175494],
+        [51.513424, -0.158953],
+        [51.514304, -0.149723],
+        [51.515224, -0.141903],
+        [51.516426, -0.13041],
+        [51.51758, -0.120475],
+        [51.518247, -0.111583],
+        [51.514936, -0.097567],
+        [51.512751, -0.088204],
+        [51.517372, -0.083182],
+        [51.527222, -0.055506],
+        [51.525122, -0.03364],
+        [51.541806, -0.003458],
+        [51.556589, -0.005523],
+        [51.568324, 0.008194],
+        [51.580678, 0.02144],
+        [51.591907, 0.027338],
+        [51.606899, 0.03397],
+        [51.626605, 0.046757],
+    ];
+
+
+    var polyCentralLoop = [
+        [51.568324, 0.008194],
+        [51.575501, 0.028527],
+        [51.576243, 0.04536],
+        [51.576544, 0.066185],
+        [51.575726, 0.090004],
+        [51.585689, 0.088585],
+        [51.595618, 0.091004],
+        [51.603659, 0.093482],
+        [51.613378, 0.092066],
+        [51.617916, 0.075041],
+        [51.617199, 0.043647],
+        [51.606899, 0.03397],
+    ];
+
+
+
+    var polyVictoria = [
+        [51.462618, -0.114888],
+        [51.472184, -0.122644],
+        [51.485743, -0.124204],
+        [51.489097, -0.133761],
+        [51.496359, -0.143102],
+        [51.506947, -0.142787],
+        [51.515224, -0.141903],
+        [51.524951, -0.138321],
+        [51.528344, -0.1323],
+        [51.530663, -0.123194],
+        [51.54635, -0.103324],
+        [51.564158, -0.106825],
+        [51.58333, -0.072584],
+        [51.588108, -0.060241],
+        [51.586919, -0.04115],
+        [51.582965, -0.019885],
+    ];
+
+    var polyDistrictEalingBroadwayUpminster = [
+        [51.544096, 0.166017],
+        [51.541639, 0.147527],
+        [51.540331, 0.127016],
+        [51.538372, 0.10153],
+        [51.539321, 0.081053],
+        [51.538948, 0.051186],
+        [51.53534, 0.035263],
+        [51.531341, 0.017451],
+        [51.528136, 0.005055],
+        [51.524839, -0.011538],
+        [51.52694, -0.025128],
+        [51.525122, -0.03364],
+        [51.521858, -0.046596],
+        [51.519518, -0.059971],
+        [51.515037, -0.072384],
+        [51.509971, -0.076546],
+        [51.5107, -0.085969],
+        [51.51151, -0.090432],
+        [51.512117, -0.094009],
+        [51.511581, -0.103659],
+        [51.511006, -0.11426],
+        [51.507058, -0.122666],
+        [51.50132, -0.124861],
+        [51.499544, -0.133608],
+        [51.496359, -0.143102],
+        [51.49227, -0.156377],
+        [51.494094, -0.174138],
+        [51.494316, -0.182658],
+        [51.492063, -0.193378],
+        [51.490459, -0.206636],
+        [51.490311, -0.213427],
+        [51.494122, -0.235881],
+        [51.494917, -0.245704],
+        [51.495148, -0.254555],
+        [51.494627, -0.267972],
+        [51.51014, -0.288265],
+        [51.515017, -0.301457],
+    ];
+
+    var polyDistrictEarlsCourtEdgewareRoad = [
+        [51.492063, -0.193378],
+        [51.501055, -0.192792],
+        [51.509128, -0.196104],
+        [51.512284, -0.187938],
+        [51.519858, -0.167832],
+    ];
+
+    var polyDistrictWimbledonEarlsCourt = [
+        [51.421207, -0.206573],
+        [51.434573, -0.199719],
+        [51.445073, -0.206602],
+        [51.459205, -0.211],
+        [51.468262, -0.208731],
+        [51.475277, -0.20117],
+        [51.480081, -0.195422],
+        [51.487061, -0.195593],
+        [51.492063, -0.193378],
+    ];
+
+
+
+
+
+
+    var polyDistrictRichmondTurnhamGreen = [
+        [51.463237, -0.301336],
+        [51.477058, -0.285241],
+        [51.491803, -0.275267],
+        [51.495148, -0.254555],
+    ];
+
+
+
+
+
+
+
+
+    var polyDLRStratfordLewishham = [
+        [51.464665, -0.012874],
+        [51.469074, -0.016728],
+        [51.474215, -0.022438],
+        [51.478087, -0.013673],
+        [51.481671, -0.01081],
+        [51.487811, -0.010139],
+        [51.490704, -0.014738],
+        [51.495728, -0.014606],
+        [51.500053, -0.016133],
+        [51.503379, -0.021421],
+        [51.504838, -0.020997],
+        [51.50703, -0.020311],
+        [51.507744, -0.017384],
+        [51.511, -0.013135],
+        [51.515172, -0.01415],
+        [51.522667, -0.017615],
+        [51.527858, -0.020936],
+        [51.534302, -0.012755],
+        [51.541758, -0.003287],
+        [51.545265, -0.009638],
+    ];
+
+
+
+    var polyDLRStratfordInternationalWoolwichArsenal = [
+        [51.490009, 0.069127],
+        [51.502003, 0.062624],
+        [51.503416, 0.048739],
+        [51.502212, 0.032115],
+        [51.502838, 0.02246],
+        [51.514127, 0.008101],
+        [51.520786, 0.004156],
+        [51.527894, 0.004482],
+        [51.531926, 0.003737],
+        [51.538196, -0.001078],
+        [51.541758, -0.003287],
+        [51.545265, -0.009638],
+    ];
+
+
+
+
+
+
+    var polyDLRBankBeckton = [
+        [51.514362, 0.061453],
+        [51.508941, 0.071555],
+        [51.508473, 0.063925],
+        [51.508793, 0.054932],
+        [51.508357, 0.045935],
+        [51.509263, 0.034158],
+        [51.509716, 0.026699],
+        [51.509336, 0.018497],
+        [51.514127, 0.008101],
+        [51.509359, -0.002326],
+        [51.507991, -0.006969],
+        [51.507744, -0.017384],
+        [51.509431, -0.02675],
+        [51.512393, -0.039809],
+        [51.511693, -0.056643],
+        [51.513233, -0.088515],
+    ];
+
+
+    var polyDLRTowerGatewayShadwell = [
+        [51.510617, -0.074818],
+        [51.511693, -0.056643],
+    ];
+
+    var polyDLRWestIndiaQuayWestferry = [
+        [51.50703, -0.020311],
+        [51.509431, -0.02675],
+    ];
+
+
+    var polyBakerloo = [
+        [51.494536, -0.100606],
+        [51.498808, -0.112315],
+        [51.503299, -0.11478],
+        [51.507058, -0.122666],
+        [51.50741, -0.127277],
+        [51.51005, -0.133798],
+        [51.515224, -0.141903],
+        [51.523344, -0.146444],
+        [51.522883, -0.15713],
+        [51.522322, -0.163207],
+        [51.520299, -0.17015],
+        [51.516581, -0.175689],
+        [51.523263, -0.183783],
+        [51.529777, -0.185758],
+        [51.534979, -0.194232],
+        [51.534158, -0.204574],
+        [51.530539, -0.225016],
+        [51.532259, -0.244283],
+        [51.53631, -0.257883],
+        [51.543959, -0.275892],
+        [51.552304, -0.296852],
+        [51.562551, -0.304],
+        [51.570232, -0.308433],
+        [51.581756, -0.31691],
+        [51.592268, -0.335217],
+    ];
+
+    var polyCircle = [
+        [51.493535, -0.225013],
+        [51.502005, -0.226715],
+        [51.505579, -0.226375],
+        [51.509669, -0.22453],
+        [51.513389, -0.217799],
+        [51.517449, -0.210391],
+        [51.52111, -0.201065],
+        [51.519113, -0.188748],
+        [51.518187, -0.178306],
+        [51.519858, -0.167832],
+        [51.522883, -0.15713],
+        [51.52384, -0.144262],
+        [51.525604, -0.135829],
+        [51.520252, -0.104913],
+        [51.520275, -0.097993],
+        [51.518176, -0.088322],
+        [51.517372, -0.083182],
+        [51.514246, -0.075689],
+        [51.509971, -0.076546],
+        [51.509971, -0.076546],
+        [51.5107, -0.085969],
+        [51.51151, -0.090432],
+        [51.512117, -0.094009],
+        [51.511581, -0.103659],
+        [51.511006, -0.11426],
+        [51.507058, -0.122666],
+        [51.50132, -0.124861],
+        [51.499544, -0.133608],
+        [51.496359, -0.143102],
+        [51.49227, -0.156377],
+        [51.494094, -0.174138],
+        [51.494316, -0.182658],
+        [51.501055, -0.192792],
+        [51.509128, -0.196104],
+        [51.512284, -0.187938],
+        [51.519858, -0.167832],
+    ];
+
+
+
+
+
+
+
+
+
+
+    var polyHammersmithAndCity = [
+        [51.493535, -0.225013],
+        [51.502005, -0.226715],
+        [51.505579, -0.226375],
+        [51.509669, -0.22453],
+        [51.513389, -0.217799],
+        [51.517449, -0.210391],
+        [51.52111, -0.201065],
+        [51.519113, -0.188748],
+        [51.518187, -0.178306],
+        [51.522883, -0.15713],
+        [51.52384, -0.144262],
+        [51.525604, -0.135829],
+        [51.520275, -0.097993],
+        [51.518176, -0.088322],
+        [51.517372, -0.083182],
+        [51.515037, -0.072384],
+        [51.519518, -0.059971],
+        [51.521858, -0.046596],
+        [51.525122, -0.03364],
+        [51.52694, -0.025128],
+        [51.524839, -0.011538],
+        [51.528136, 0.005055],
+        [51.531341, 0.017451],
+        [51.53534, 0.035263],
+        [51.538948, 0.051186],
+        [51.539321, 0.081053],
+    ];
+
+
+
+
+    var polyWaterlooAnddCity = [
+        [51.503299, -0.11478],
+        [51.512751, -0.088204],
+    ];
+
+
+
+
+    var polyOvergroundWestCroyden = [
+        [51.378428, -0.102585],
+        [51.397019, -0.075221],
+        [51.412153, -0.065886],
+        [51.417555, -0.06084],
+        [51.427248, -0.054244],
+        [51.43928, -0.053157],
+        [51.449989, -0.045505],
+        [51.464649, -0.037537],
+        [51.475128, -0.040399],
+        [51.493196, -0.047519],
+        [51.497945, -0.049722],
+        [51.500817, -0.052048],
+        [51.504388, -0.055931],
+        [51.511284, -0.056934],
+        [51.519469, -0.059757],
+        [51.523375, -0.075246],
+        [51.531512, -0.075681],
+        [51.538705, -0.075666],
+        [51.546116, -0.075137],
+        [51.548732, -0.092191],
+        [51.546177, -0.103764],
+    ];
+
+    var polyOvergroundCrystalPalace = [
+        [51.418109, -0.07261],
+        [51.427248, -0.054244],
+    ];
+
+
+    var polyOvergroundNewCross = [
+        [51.476344, -0.032441],
+        [51.493196, -0.047519],
+    ];
+
+    var polyOvergroundClaphamJunctionSurreyQuays = [
+        [51.464187, -0.170221],
+        [51.470216, -0.13852],
+        [51.465481, -0.132522],
+        [51.468203, -0.089361],
+        [51.470034, -0.069414],
+        [51.473566, -0.057313],
+        [51.493196, -0.047519],
+    ];
+
+
+
+
+
+
+    var polyOvergroundClaphamJunctionStratford = [
+        [51.464187, -0.170221],
+        [51.474949, -0.182823],
+        [51.487061, -0.195593],
+        [51.497899, -0.210364],
+        [51.505285, -0.217654],
+        [51.532497, -0.244548],
+        [51.534554, -0.219957],
+        [51.540699, -0.210128],
+        [51.545166, -0.202309],
+        [51.547468, -0.191185],
+        [51.550266, -0.183141],
+        [51.55521, -0.165705],
+        [51.555335, -0.15077],
+        [51.546548, -0.146655],
+        [51.541791, -0.138701],
+        [51.543041, -0.116729],
+        [51.546177, -0.103764],
+        [51.549732, -0.092791],
+        [51.548148, -0.075701],
+        [51.547105, -0.056058],
+        [51.547012, -0.04236],
+        [51.54341, -0.02492],
+        [51.541895, -0.003397],
+    ];
+
+
+
+
+    var polyOvergroundLiverpoolStreetChingford = [
+        [51.517991, -0.081426],
+        [51.523917, -0.059568],
+        [51.531973, -0.057279],
+        [51.541153, -0.057753],
+        [51.548757, -0.060819],
+        [51.561644, -0.057025],
+        [51.580981, -0.032918],
+        [51.582919, -0.019815],
+        [51.58658, -0.002405],
+        [51.60835, -0.000222],
+        [51.633087, 0.009897],
+    ];
+
+    var polyOvergroundEnfieldTownHackneyDowns = [
+        [51.652026, -0.079328],
+        [51.641519, -0.069221],
+        [51.624929, -0.061112],
+        [51.614688, -0.06724],
+        [51.605037, -0.070914],
+        [51.593959, -0.069867],
+        [51.582268, -0.07527],
+        [51.574467, -0.076682],
+        [51.565233, -0.072887],
+        [51.558502, -0.068267],
+        [51.548757, -0.060819],
+    ];
+
+
+    var polyOvergroundEdmontonGreenCheshunt = [
+        [51.648705, -0.052437],
+        [51.624929, -0.061112],
+    ];
+
+
+
+
+
+    var polyOvergroundGospelOakBarking = [
+        [51.539495, 0.080903],
+        [51.549264, 0.044423],
+        [51.551693, 0.026213],
+        [51.563554, 0.008416],
+        [51.569725, -0.008051],
+        [51.581503, -0.023846],
+        [51.586605, -0.041236],
+        [51.580372, -0.072103],
+        [51.577182, -0.098144],
+        [51.571302, -0.117149],
+        [51.563631, -0.129513],
+        [51.555335, -0.15077],
+    ];
+
+
+
+    var polyOvergroundEustonWatfordJunction = [
+        [51.528136, -0.133924],
+        [51.541432, -0.178878],
+        [51.537277, -0.192237],
+        [51.533966, -0.204985],
+        [51.53054, -0.225088],
+        [51.532497, -0.244548],
+        [51.536289, -0.257667],
+        [51.544111, -0.275828],
+        [51.552325, -0.296433],
+        [51.562596, -0.303984],
+        [51.570214, -0.308462],
+        [51.581802, -0.316981],
+        [51.592169, -0.334571],
+        [51.602649, -0.35722],
+    ];
+
+
+    var polyOvergroundRichmondWillesdenJunction = [
+        [51.463061, -0.301558],
+        [51.477073, -0.285054],
+        [51.491678, -0.275286],
+        [51.499695, -0.270157],
+        [51.508716, -0.262971],
+        [51.532497, -0.244548],
+    ];
+
+
+    var polylineOptions = { weight: 8, opacity: 0.6, smoothFactor: 10, lineJoin: 'round' };
+
+
+    var plDLRStratfordInternationalWoolwichArsenal = L.polyline(polyDLRStratfordInternationalWoolwichArsenal, polylineOptions);
+    plDLRStratfordInternationalWoolwichArsenal.setStyle({ color: '#00A4A7' });
+
+    var plDLRStratfordLewishham = L.polyline(polyDLRStratfordLewishham, polylineOptions);
+    plDLRStratfordLewishham.setStyle({ color: '#00A4A7' });
+
+    var plDLRBankBeckton = L.polyline(polyDLRBankBeckton, polylineOptions);
+    plDLRBankBeckton.setStyle({ color: '#00A4A7' });
+
+    var plDLRTowerGatewayShadwell = L.polyline(polyDLRTowerGatewayShadwell, polylineOptions);
+    plDLRTowerGatewayShadwell.setStyle({ color: '#00A4A7' });
+
+    var plDLRWestIndiaQuayWestferry = L.polyline(polyDLRWestIndiaQuayWestferry, polylineOptions);
+    plDLRWestIndiaQuayWestferry.setStyle({ color: '#00A4A7' });
+
+
+
+
+    var plJubilee = L.polyline(polyJubilee, polylineOptions);
+    plJubilee.setStyle({ color: '#A0A5A9' });
+
+
+
+    var plOvergroundWestCroyden = L.polyline(polyOvergroundWestCroyden, polylineOptions);
+    plOvergroundWestCroyden.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundCrystalPalace = L.polyline(polyOvergroundCrystalPalace, polylineOptions);
+    plOvergroundCrystalPalace.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundNewCross = L.polyline(polyOvergroundNewCross, polylineOptions);
+    plOvergroundNewCross.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundClaphamJunctionSurreyQuays = L.polyline(polyOvergroundClaphamJunctionSurreyQuays, polylineOptions);
+    plOvergroundClaphamJunctionSurreyQuays.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundClaphamJunctionStratford = L.polyline(polyOvergroundClaphamJunctionStratford, polylineOptions);
+    plOvergroundClaphamJunctionStratford.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundLiverpoolStreetChingford = L.polyline(polyOvergroundLiverpoolStreetChingford, polylineOptions);
+    plOvergroundLiverpoolStreetChingford.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundEnfieldTownHackneyDowns = L.polyline(polyOvergroundEnfieldTownHackneyDowns, polylineOptions);
+    plOvergroundEnfieldTownHackneyDowns.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundEdmontonGreenCheshunt = L.polyline(polyOvergroundEdmontonGreenCheshunt, polylineOptions);
+    plOvergroundEdmontonGreenCheshunt.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundGospelOakBarking = L.polyline(polyOvergroundGospelOakBarking, polylineOptions);
+    plOvergroundGospelOakBarking.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundEustonWatfordJunction = L.polyline(polyOvergroundEustonWatfordJunction, polylineOptions);
+    plOvergroundEustonWatfordJunction.setStyle({ color: '#EE7C0E' });
+
+    var plOvergroundRichmondWillesdenJunction = L.polyline(polyOvergroundRichmondWillesdenJunction, polylineOptions);
+    plOvergroundRichmondWillesdenJunction.setStyle({ color: '#EE7C0E' });
+
+
+
+    var plWaterlooAnddCity = L.polyline(polyWaterlooAnddCity, polylineOptions);
+    plWaterlooAnddCity.setStyle({ color: '#95CDBA' });
+
+
+
+
+    var plDistrictEalingBroadwayUpminster = L.polyline(polyDistrictEalingBroadwayUpminster, polylineOptions);
+    plDistrictEalingBroadwayUpminster.setStyle({ color: '#00782A' });
+
+    var plDistrictEarlsCourtEdgewareRoad = L.polyline(polyDistrictEarlsCourtEdgewareRoad, polylineOptions);
+    plDistrictEarlsCourtEdgewareRoad.setStyle({ color: '#00782A' });
+
+    var plDistrictWimbledonEarlsCourt = L.polyline(polyDistrictWimbledonEarlsCourt, polylineOptions);
+    plDistrictWimbledonEarlsCourt.setStyle({ color: '#00782A' });
+
+    var plDistrictRichmondTurnhamGreen = L.polyline(polyDistrictRichmondTurnhamGreen, polylineOptions);
+    plDistrictRichmondTurnhamGreen.setStyle({ color: '#00782A' });
+
+
+
+
+    var plNorthernBarnetBranch = L.polyline(polyNorthernBarnetBranch, polylineOptions);
+    plNorthernBarnetBranch.setStyle({ color: '#000' });
+
+    var plNorthernMillHillBranch = L.polyline(polyNorthernMillHillBranch, polylineOptions);
+    plNorthernMillHillBranch.setStyle({ color: '#000' });
+
+    var plNorthernCharingCrossBranch = L.polyline(polyNorthernCharingCrossBranch, polylineOptions);
+    plNorthernCharingCrossBranch.setStyle({ color: '#000' });
+
+    var plNorthernBankBranch = L.polyline(polyNorthernBankBranch, polylineOptions);
+    plNorthernBankBranch.setStyle({ color: '#000' });
+
+    var plNorthernMorden = L.polyline(polyNorthernMorden, polylineOptions);
+    plNorthernMorden.setStyle({ color: '#000' });
+
+    var plNorthernEdgeware = L.polyline(polyNorthernEdgeware, polylineOptions);
+    plNorthernEdgeware.setStyle({ color: '#000' });
+
+
+
+
+    var plPiccadillyHeathrow = L.polyline(polyPiccadillyHeathrow, polylineOptions);
+    plPiccadillyHeathrow.setStyle({ color: '#003688' });
+
+    var plPiccadillyUxbridge = L.polyline(polyPiccadillyUxbridge, polylineOptions);
+    plPiccadillyUxbridge.setStyle({ color: '#003688' });
+
+
+
+
+    var plMetropolitanAmershamAldgate = L.polyline(polyMetropolitanAmershamAldgate, polylineOptions);
+    plMetropolitanAmershamAldgate.setStyle({ color: '#9B0056' });
+
+    var plMetropolitanUxbridgeHarrowOnTheHill = L.polyline(polyMetropolitanUxbridgeHarrowOnTheHill, polylineOptions);
+    plMetropolitanUxbridgeHarrowOnTheHill.setStyle({ color: '#9B0056' });
+
+
+
+
+    var plCentralLoop = L.polyline(polyCentralLoop, polylineOptions);
+    plCentralLoop.setStyle({ color: '#E32017' });
+
+    var plCentralWestRuislipBranch = L.polyline(polyCentralWestRuislipBranch, polylineOptions);
+    plCentralWestRuislipBranch.setStyle({ color: '#E32017' });
+
+    var plCentralEalingBroadwayEpping = L.polyline(polyCentralEalingBroadwayEpping, polylineOptions);
+    plCentralEalingBroadwayEpping.setStyle({ color: '#E32017' });
+
+
+
+
+    var plVictoria = L.polyline(polyVictoria, polylineOptions);
+    plVictoria.setStyle({ color: '#0098D4' });
+
+
+
+
+    var plHammersmithAndCity = L.polyline(polyHammersmithAndCity, polylineOptions);
+    plHammersmithAndCity.setStyle({ color: '#F3A9BB' });
+
+
+
+
+    var plCircle = L.polyline(polyCircle, polylineOptions);
+    plCircle.setStyle({ color: '#FFD300' });
+
+
+
+
+    var plBakerloo = L.polyline(polyBakerloo, polylineOptions);
+    plBakerloo.setStyle({ color: '#B36305' });
+
+
+    var hammersmithAndCityLine = L.layerGroup([plHammersmithAndCity]).addTo(mymap);
+    var circleLine = L.layerGroup([plCircle]).addTo(mymap);
+    var overgroundLine = L.layerGroup([plOvergroundRichmondWillesdenJunction, plOvergroundEustonWatfordJunction, plOvergroundGospelOakBarking, plOvergroundEdmontonGreenCheshunt, plOvergroundEnfieldTownHackneyDowns, plOvergroundLiverpoolStreetChingford, plOvergroundClaphamJunctionStratford, plOvergroundClaphamJunctionSurreyQuays, plOvergroundNewCross, plOvergroundCrystalPalace, plOvergroundWestCroyden]).addTo(mymap);
+    var jubileeLine = L.layerGroup([plJubilee]).addTo(mymap);
+    var waterlooAndCityLine = L.layerGroup([plWaterlooAnddCity]).addTo(mymap);
+    var bakerlooLine = L.layerGroup([plBakerloo]).addTo(mymap);
+    var centralLine = L.layerGroup([plCentralWestRuislipBranch, plCentralLoop, plCentralEalingBroadwayEpping]).addTo(mymap);
+    var victoriaLine = L.layerGroup([plVictoria]).addTo(mymap);
+    var metropolitanLine = L.layerGroup([plMetropolitanAmershamAldgate, plMetropolitanUxbridgeHarrowOnTheHill]).addTo(mymap);
+    var piccadillyLine = L.layerGroup([plPiccadillyHeathrow, plPiccadillyUxbridge]).addTo(mymap);
+    var northernLine = L.layerGroup([plNorthernEdgeware, plNorthernMorden, plNorthernBankBranch, plNorthernCharingCrossBranch, plNorthernBarnetBranch, plNorthernMillHillBranch]).addTo(mymap);
+    var districtLine = L.layerGroup([plDistrictEalingBroadwayUpminster, plDistrictEarlsCourtEdgewareRoad, plDistrictWimbledonEarlsCourt, plDistrictRichmondTurnhamGreen]).addTo(mymap);
+    var dlrLine = L.layerGroup([plDLRWestIndiaQuayWestferry, plDLRTowerGatewayShadwell, plDLRBankBeckton, plDLRStratfordLewishham, plDLRStratfordInternationalWoolwichArsenal]).addTo(mymap);
+
+
+    var overlayMaps = {
+        "Central line": centralLine,
+        "Hammersmith & City line": hammersmithAndCityLine,
+        "Circle line": circleLine,
+        "Overground line": overgroundLine,
+        "Waterloo and City line": waterlooAndCityLine,
+        "Jubilee line": jubileeLine,
+        "Bakerloo line": bakerlooLine,
+        "Metropolitan line": metropolitanLine,
+        "Piccadilly line": piccadillyLine,
+        "Northern line": northernLine,
+        "District line": districtLine,
+        "DLR": dlrLine,
+        "Victoria line": victoriaLine
+    };
+
+    lcontrol = L.control.layers(null, overlayMaps,{collapsed:false}).addTo(mymap);
+
+    mymap.on('zoomend', function () {
+
+        const zoomLevel = mymap.getZoom();
+
+        if (zoomLevel < 14) {
+            var stationlabel = document.querySelectorAll('.station-label'), i;
+
+            for (i = 0; i < stationlabel.length; ++i) {
+                stationlabel[i].style.display = "none";
+            }
+        }
+        else {
+            var stationlabel = document.querySelectorAll('.station-label'), i;
+
+            for (i = 0; i < stationlabel.length; ++i) {
+                stationlabel[i].style.display = "block";
+            }
+
+            if (zoomLevel > 16) {
+                var fullnamelabel = document.querySelectorAll('.fullname'), i;
+                var namelabel = document.querySelectorAll('.name'), i;
+                var mininamelabel = document.querySelectorAll('.mininame'), i;
+
+                for (i = 0; i < fullnamelabel.length; ++i) {
+                    fullnamelabel[i].style.display = "block";
+                    namelabel[i].style.display = "none";
+                    mininamelabel[i].style.display = "none";
+                }
+            }
+            else if (zoomLevel === 16 || zoomLevel === 15) {
+                var fullnamelabel = document.querySelectorAll('.fullname'), i;
+                var namelabel = document.querySelectorAll('.name'), i;
+                var mininamelabel = document.querySelectorAll('.mininame'), i;
+
+                for (i = 0; i < fullnamelabel.length; ++i) {
+                    fullnamelabel[i].style.display = "none";
+                    namelabel[i].style.display = "block";
+                    mininamelabel[i].style.display = "none";
+                }
+            }
+            else if (zoomLevel === 14) {
+                var fullnamelabel = document.querySelectorAll('.fullname'), i;
+                var namelabel = document.querySelectorAll('.name'), i;
+                var mininamelabel = document.querySelectorAll('.mininame'), i;
+
+                for (i = 0; i < fullnamelabel.length; ++i) {
+                    fullnamelabel[i].style.display = "none";
+                    namelabel[i].style.display = "none";
+                    mininamelabel[i].style.display = "block";
+                }
+            }
+        }
+
+
+    });
+
+
+
+
+    addToMapUI();
+
+
+
+    function addToMapUI() {
+
+
+        var lcaUI = document.querySelector('.leaflet-control-layers-overlays>div');
+
+        if (lcaUI === null) {
+
+            var layerControlAdditionalUI = document.createElement('div', { id: 'layerui' });
+            layerControlAdditionalUI.setAttribute("id","layerui");
+
+            var showHideSpan = document.createElement('span');
+            showHideSpan.setAttribute("class","showhide");
+
+
+            var showLink = document.createElement('a');
+            showLink.setAttribute("class","show");
+
+            var hideLink = document.createElement('a', { class: 'hide' });
+            hideLink.setAttribute("class","hide");
+
+            var showLinkText = document.createTextNode('show');
+            var showHideTextA = document.createTextNode(' or ');
+            var hideLinkText = document.createTextNode('hide');
+            var showHideTextB = document.createTextNode(' all lines');
+
+            showHideSpan.appendChild(showLink);
+            showHideSpan.appendChild(showHideTextA);
+            showHideSpan.appendChild(hideLink);
+            showHideSpan.appendChild(showHideTextB);
+
+            showLink.appendChild(showLinkText);
+            hideLink.appendChild(hideLinkText);
+
+            showLink.href = "#";
+            hideLink.href = "#";
+
+
+
+            var separatorDiv = document.createElement('div');
+            separatorDiv.setAttribute("class","leaflet-control-layers-separator");
+
+
+
+
+            // Get the parent node
+            var parentNode = document.querySelector('.leaflet-control-layers-overlays');
+
+
+
+
+            var hideStationslabel = document.createElement('label');
+            hideStationslabel.setAttribute("id","hideStations");
+
+            var hideStations = document.createElement('input');
+            hideStations.setAttribute("type","checkbox");
+            hideStations.setAttribute("id","hideStations");
+
+            if (hideStationLine){
+                    hideStations.checked = true;
+                }
+                else{
+                    hideStations.checked = false;
+                }
+
+            var hideStationsSpan = document.createElement('span');
+            hideStationsSpan.setAttribute("class","hideStationsSpan");
+            var hideStationText = document.createTextNode(`only show a station when it's line is showing`);
+            hideStationsSpan.appendChild(hideStationText);
+
+            hideStationslabel.appendChild(hideStations);
+            hideStationslabel.appendChild(hideStationsSpan);
+
+
+            var keyDescription = document.createElement('span');
+            keyDescription.setAttribute("class", "key-description")
+            keyDescriptionText = document.createTextNode(`Dark grey borders = Zone 1   Light grey fill = Interchange   Pink border = Pink card reader`);
+            keyDescription.appendChild(keyDescriptionText);
+
+
+
+
+
+
+            // Insert the new node before the reference node
+            parentNode.append(layerControlAdditionalUI);
+
+            layerControlAdditionalUI.append(keyDescription);
+
+            layerControlAdditionalUI.append(separatorDiv);
+            layerControlAdditionalUI.append(showHideSpan);
+            layerControlAdditionalUI.append(hideStationslabel);
+
+
+
+
+            showLink.addEventListener('click', showAllLines);
+            hideLink.addEventListener('click', hideAllLines);
+            hideStationslabel.addEventListener('change', toggleHideStations);
+
+
+        }
+
+    }
+
+
+
+    //const checkboxes = document.querySelectorAll('input[type="checkbox"].leaflet-control-layers-selector');
+    const lineLayers = [centralLine, hammersmithAndCityLine, circleLine, overgroundLine, waterlooAndCityLine, jubileeLine, bakerlooLine, metropolitanLine, piccadillyLine, northernLine, districtLine, dlrLine, victoriaLine]
+
+    function showAllLines() {
+        lineLayers.forEach(lineLayer => {
+            mymap.addLayer(lineLayer);
+
+        });
+
+        addToMapUI();
+        showStationsforVisibleLinesOnly();
+    }
+
+    function hideAllLines() {
+        lineLayers.forEach(lineLayer => {
+            mymap.removeLayer(lineLayer);
+        });
+
+        if (hideStationLine) showStationsforVisibleLinesOnly();
+        addToMapUI();
+    }
+
+
+
+function toggleHideStations() {
+    if (hideStationLine){
+        //hideStations.checked =false;
+
+        hideStationLine = false;
+        addToMapUI();
+        showStationsForAllLines();
+    }
+    else{
+        //hideStations.checked = true;
+        hideStationLine = true;
+        addToMapUI();
+        showStationsforVisibleLinesOnly();
+    }
+    //console.log ("hideStationLine " + hideStationLine)
+}
+
+
+
+
+function showStationsForAllLines(){
+    // select all station icons
+    var stations = document.querySelectorAll('.leaflet-marker-icon'), i;
+
+    // make them all invisible
+    for (i = 0; i < stations.length; ++i) {
+        stations[i].style.display = "block";
+    }
+}
+
+
+let visibleLineLayers = [];
+
+createVisibleLineArray();
+
+    function showStationsforVisibleLinesOnly() {
+
+        // select all station icons
+        var stations = document.querySelectorAll('.leaflet-marker-icon'), i;
+
+        // make them all invisible
+        for (i = 0; i < stations.length; ++i) {
+            stations[i].style.display = "none";
+        }
+
+        // loop through the lines that you want to be visible
+        visibleLineLayers.forEach((visibleLineLayer) => {
+
+            // select the station icons by class, using the visible station
+            var stationsMakeVisible = document.querySelectorAll(`.${visibleLineLayer}`), i;
+
+            // make them visible
+            for (i = 0; i < stationsMakeVisible.length; ++i) {
+                stationsMakeVisible[i].style.display = "block";
+            }
+        });
+
+
+
+        //addToMapUI();
+    }
+
+
+function createVisibleLineArray(){
+        // reset global array
+        visibleLineLayers = [];
+
+        // loop through the layers object check if the layer is there, if it is, push it into the visibleLineLayers array
+        for (var property in overlayMaps) {
+            if (overlayMaps.hasOwnProperty(property)) {
+
+                // shortened easier to understand version without processing the text/ternary etc: if (mymap.hasLayer(overlayMaps[property])){visibleLineLayers.push((property)};
+                if (mymap.hasLayer(overlayMaps[property])){visibleLineLayers.push((property.indexOf(" ") == -1) ? property.toLowerCase() : property.slice(0, property.indexOf(" ")).toLowerCase())};
+            }
+        }
+}
+
+
+const checkboxes = document.querySelectorAll('input[type="checkbox"].leaflet-control-layers-selector');
+
+
+
+document.addEventListener('click', function () {
+    if ( event.target.classList.contains('leaflet-control-layers-selector') || event.target.classList.contains('show') || event.target.classList.contains('hide')) {
+
+/*
+        // reset global array
+        visibleLineLayers = [];
+
+        // loop through the layers object check if the layer is there, if it is, push it into the visibleLineLayers array
+        for (var property in overlayMaps) {
+            if (overlayMaps.hasOwnProperty(property)) {
+
+                // shortened easier to understand version without processing the text/ternary etc: if (mymap.hasLayer(overlayMaps[property])){visibleLineLayers.push((property)};
+                if (mymap.hasLayer(overlayMaps[property])){visibleLineLayers.push((property.indexOf(" ") == -1) ? property.toLowerCase() : property.slice(0, property.indexOf(" ")).toLowerCase())};
+            }
+        }
+        */
+
+        createVisibleLineArray();
+
+
+        if (hideStationLine) {
+            showStationsforVisibleLinesOnly();
+        }
+        else
+        {
+            showStationsForAllLines();
+        }
+    }
+}, false);
+
+
+
+</script>
+
+</html>
