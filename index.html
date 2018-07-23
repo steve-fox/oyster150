@@ -15,6 +15,8 @@
 
     <link rel = "stylesheet" type = "text/css" href = "style.css" />
 
+    <script src="modernizr-custom.js"></script>
+
     <title>Oyster £1.50</title>
 </head>
 
@@ -30,9 +32,13 @@
     <div id="mapid"></div>
 
 </body>
-
+TextTrackCue
 
 <script>
+
+var collapsedLayerGroup = true;
+
+if (window.innerWidth > 1000) collapsedLayerGroup=false;
 
 
     var hideStationLine = true;
@@ -1541,7 +1547,7 @@ const lines = [
         "Victoria line": victoriaLine
     };
 
-    lcontrol = L.control.layers(null, overlayMaps,{collapsed:false}).addTo(mymap);
+    lcontrol = L.control.layers(null, overlayMaps,{collapsed:collapsedLayerGroup}).addTo(mymap);
 
     mymap.on('zoomend', function () {
 
