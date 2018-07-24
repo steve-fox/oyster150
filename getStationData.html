@@ -52,6 +52,129 @@
     ]);
 
 
+    /*
+
+  const html = stationsList.map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', longitude: ${astation.lon}, latitude: ${astation.lat} },
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+
+
+      const html = stationsList.map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', longitude: ${astation.lon}, latitude: ${astation.lat}, zone: ${stationsList[0]['additionalProperties'][stationsList[0]['additionalProperties'].findIndex(x => x.key=="Zone")].value}},
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+
+
+
+
+--
+let html = stationsList.map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', longitude: ${astation.lon}, latitude: ${astation.lat}, zone: ${astation.additionalProperties.findIndex(x => x.key=="Zone")}},
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+--
+
+
+
+let html = stationsList.sort((a, b) => a.commonName > b.commonName ? 1 : -1).map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}',
+                name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}',
+                mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...',
+                longitude: ${astation.lon},
+                latitude: ${astation.lat},
+                lines: ${Array.prototype.map.call(stationsList[0].lines, s => ' ' +s.name).toString().trim();},
+                zone: '${(astation.additionalProperties.findIndex(x => x.key=="Zone") == -1) ? '-1' : astation.additionalProperties[astation.additionalProperties.findIndex(x => x.key=="Zone")].value}'},
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+
+
+html = stationsList.sort((a, b) => a.commonName > b.commonName ? 1 : -1).map(astation => {
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', longitude: ${astation.lon}, latitude: ${astation.lat}, lines: '${Array.prototype.map.call(astation.lines.filter(noBuses => {return ['Piccadilly', 'Bakerloo', 'Circle', 'Northern', 'Central', 'District', 'Jubilee', 'Metropolitan', 'Victoria', 'DLR', 'Hammersmith & City', 'Waterloo & City', 'Overground'].includes(noBuses.name)}), s => ' ' +s.name).toString().trim()}', zone: '${(astation.additionalProperties.findIndex(x => x.key=="Zone") == -1) ? '-1' : astation.additionalProperties[astation.additionalProperties.findIndex(x => x.key=="Zone")].value}'},
+        `;
+      }).join('');
+    console.log('const stations = [' + html + '];');
+
+
+
+
+
+misc
+Array.prototype.map.call(stationsList[350].lines.filter(noBuses => {return ['Piccadilly', 'Bakerloo', 'Circle', 'Northern', 'Central', 'District', 'Jubilee', 'Metropolitan', 'Victoria', 'DLR', 'Hammersmith & City', 'Waterloo & City', 'Overground'].includes(noBuses.name)}), s => ' ' +s.name).toString().trim();
+//stationsList[0]['additionalProperties'][stationsList[0]['additionalProperties'].findIndex(x => x.key=="Zone")].value
+Array.prototype.map.call(stationsList[0].lines, s => ' ' +s.name).toString().trim();
+
+
+
+
+
+
+//THIS IS THE CURRENT METHOD AND STOPS DUPLICATES
+var lastStation = "";
+
+html = stationsList.sort((a, b) => a.commonName > b.commonName ? 1 : -1).map(astation => {
+    if (lastStation != astation.commonName.replace(/'/g, '&#39;')){
+        lastStation=astation.commonName.replace(/'/g, '&#39;');
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', \
+name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', \
+mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', \
+longitude: ${astation.lon}, \
+latitude: ${astation.lat}, \
+pinkreader: ${['Blackhorse Road Rail Station', 'Canada Water Rail Station', 'Clapham Junction Rail Station', 'Gospel Oak Rail Station', 'Gunnersbury Rail Station', 'Hackney Central Rail Station', 'Hackney Downs Rail Station', 'Highbury & Islington Rail Station', 'Kensington (Olympia) Rail Station', 'Richmond (London) Rail Station', 'Stratford Rail Station', 'Surrey Quays Rail Station', 'West Brompton Rail Station', 'Whitechapel Rail Station', 'Willesden Junction Rail Station', 'Rayners Lane Underground Station', 'Wimbledon Underground Station'].includes(astation.commonName) ? "true" : "false"}, \
+lines: '${Array.prototype.map.call(astation.lines.filter(noBuses => {return ['Piccadilly', 'Bakerloo', 'Circle', 'Northern', 'Central', 'District', 'Jubilee', 'Metropolitan', 'Victoria', 'DLR', 'Hammersmith & City', 'Waterloo & City', 'London Overground'].includes(noBuses.name)}), s => ' ' +s.name).toString().trim()}', \
+zone: '${(astation.additionalProperties.findIndex(x => x.key=="Zone") == -1) ? '-1' : astation.additionalProperties[astation.additionalProperties.findIndex(x => x.key=="Zone")].value}'},
+        `;
+        }
+      }).join('').replace('-1', 'zone data for this station unavailable from tfl data');
+    console.log('const stations = [' + html + '];');
+
+    const lines = [
+        { name: 'northern' },
+        { name: 'piccadilly' },
+        { name: 'central' },
+        { name: 'bakerloo' },
+        { name: 'district' },
+        { name: 'jubilee' },
+        { name: 'metropolitan' },
+        { name: 'victoria' },
+        { name: 'dlr' },
+        { name: 'hammersmith-city' },
+        { name: 'waterloo-city' },
+        { name: 'london-overground' },
+        { name: 'circle' }
+    ];
+
+
+
+
+// comment out when you don't need to hit tfl data
+const lines = [
+        { name: 'northern' }
+    ];
+
+
+
+
+
+    let stoppoints;
+    const stationsList = [];
+
+    lines.forEach(function (line, index) {
+
+        stoppoints = `https://api.tfl.gov.uk/line/${line.name}/stoppoints`;
+
+
+        fetch(stoppoints)
+            .then(blob => blob.json())
+            .then(data => stationsList.push(...data));
+
+    });
+*/
+
 
 
 
