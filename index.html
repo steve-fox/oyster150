@@ -26,12 +26,9 @@
 
 <script>
 
-    var collapsedLayerGroup = true;
-
-    if (window.innerWidth > 1000) collapsedLayerGroup = false;
-
-
-    var hideStationLine = true;
+    const largeBrowser = (window.innerWidth > 1000) ? true : false;
+    const collapsedLayerGroup = (largeBrowser) ? false : true;
+    const hideStationLine = true;
 
 
     var mymap = L.map('mapid').setView([51.509, -0.15], 13);
@@ -276,54 +273,55 @@
     lcontrol = L.control.layers(null, overlayMaps, { collapsed: collapsedLayerGroup }).addTo(mymap);
 
     mymap.on('zoomend', function () {
+        if (largeBrowser) {
+            const zoomLevel = mymap.getZoom();
 
-        const zoomLevel = mymap.getZoom();
+            if (zoomLevel < 14) {
+                var stationlabel = document.querySelectorAll('.station-label'), i;
 
-        if (zoomLevel < 14) {
-            var stationlabel = document.querySelectorAll('.station-label'), i;
-
-            for (i = 0; i < stationlabel.length; ++i) {
-                stationlabel[i].style.display = "none";
-            }
-        }
-        else {
-            var stationlabel = document.querySelectorAll('.station-label'), i;
-
-            for (i = 0; i < stationlabel.length; ++i) {
-                stationlabel[i].style.display = "block";
-            }
-
-            if (zoomLevel > 16) {
-                var fullnamelabel = document.querySelectorAll('.fullname'), i;
-                var namelabel = document.querySelectorAll('.name'), i;
-                var mininamelabel = document.querySelectorAll('.mininame'), i;
-
-                for (i = 0; i < fullnamelabel.length; ++i) {
-                    fullnamelabel[i].style.display = "block";
-                    namelabel[i].style.display = "none";
-                    mininamelabel[i].style.display = "none";
+                for (i = 0; i < stationlabel.length; ++i) {
+                    stationlabel[i].style.display = "none";
                 }
             }
-            else if (zoomLevel === 16 || zoomLevel === 15) {
-                var fullnamelabel = document.querySelectorAll('.fullname'), i;
-                var namelabel = document.querySelectorAll('.name'), i;
-                var mininamelabel = document.querySelectorAll('.mininame'), i;
+            else {
+                var stationlabel = document.querySelectorAll('.station-label'), i;
 
-                for (i = 0; i < fullnamelabel.length; ++i) {
-                    fullnamelabel[i].style.display = "none";
-                    namelabel[i].style.display = "block";
-                    mininamelabel[i].style.display = "none";
+                for (i = 0; i < stationlabel.length; ++i) {
+                    stationlabel[i].style.display = "block";
                 }
-            }
-            else if (zoomLevel === 14) {
-                var fullnamelabel = document.querySelectorAll('.fullname'), i;
-                var namelabel = document.querySelectorAll('.name'), i;
-                var mininamelabel = document.querySelectorAll('.mininame'), i;
 
-                for (i = 0; i < fullnamelabel.length; ++i) {
-                    fullnamelabel[i].style.display = "none";
-                    namelabel[i].style.display = "none";
-                    mininamelabel[i].style.display = "block";
+                if (zoomLevel > 16) {
+                    var fullnamelabel = document.querySelectorAll('.fullname'), i;
+                    var namelabel = document.querySelectorAll('.name'), i;
+                    var mininamelabel = document.querySelectorAll('.mininame'), i;
+
+                    for (i = 0; i < fullnamelabel.length; ++i) {
+                        fullnamelabel[i].style.display = "block";
+                        namelabel[i].style.display = "none";
+                        mininamelabel[i].style.display = "none";
+                    }
+                }
+                else if (zoomLevel === 16 || zoomLevel === 15) {
+                    var fullnamelabel = document.querySelectorAll('.fullname'), i;
+                    var namelabel = document.querySelectorAll('.name'), i;
+                    var mininamelabel = document.querySelectorAll('.mininame'), i;
+
+                    for (i = 0; i < fullnamelabel.length; ++i) {
+                        fullnamelabel[i].style.display = "none";
+                        namelabel[i].style.display = "block";
+                        mininamelabel[i].style.display = "none";
+                    }
+                }
+                else if (zoomLevel === 14) {
+                    var fullnamelabel = document.querySelectorAll('.fullname'), i;
+                    var namelabel = document.querySelectorAll('.name'), i;
+                    var mininamelabel = document.querySelectorAll('.mininame'), i;
+
+                    for (i = 0; i < fullnamelabel.length; ++i) {
+                        fullnamelabel[i].style.display = "none";
+                        namelabel[i].style.display = "none";
+                        mininamelabel[i].style.display = "block";
+                    }
                 }
             }
         }
@@ -553,22 +551,7 @@
     document.addEventListener('click', function () {
         if (event.target.classList.contains('leaflet-control-layers-selector') || event.target.classList.contains('show') || event.target.classList.contains('hide')) {
 
-            /*
-                    // reset global array
-                    visibleLineLayers = [];
-
-                    // loop through the layers object check if the layer is there, if it is, push it into the visibleLineLayers array
-                    for (var property in overlayMaps) {
-                        if (overlayMaps.hasOwnProperty(property)) {
-
-                            // shortened easier to understand version without processing the text/ternary etc: if (mymap.hasLayer(overlayMaps[property])){visibleLineLayers.push((property)};
-                            if (mymap.hasLayer(overlayMaps[property])){visibleLineLayers.push((property.indexOf(" ") == -1) ? property.toLowerCase() : property.slice(0, property.indexOf(" ")).toLowerCase())};
-                        }
-                    }
-                    */
-
             createVisibleLineArray();
-
 
             if (hideStationLine) {
                 showStationsforVisibleLinesOnly();
