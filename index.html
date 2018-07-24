@@ -551,20 +551,19 @@
     }
 
 
-    // add the same event listener to multiple elements by adding to document...
+    // add an event listener to click event on document....
     document.addEventListener('click', function () {
         // then check if it's actually what you want being clicked
-        // todo: is this still the best way? not sure if we had classes to work with before, anyways, check it out in time
+        // todo: is this still the best way? not sure if we had classes to work with before, anyways, check it out in
         if (event.target.classList.contains('leaflet-control-layers-selector') || event.target.classList.contains('show') || event.target.classList.contains('hide')) {
 
+            createVisibleLineArray();            //todo: check out more thoroughly
+
             if (hideStationLine) {
-                createVisibleLineArray();
                 showStationsforVisibleLinesOnly();
             }
             else {
-                // todo: check the logic here and make sure this is necessary and why (seems when you hide all and pump toggle button with
-                // this line commented out, it stops working, but should that be the case?) [can't reproduce just now, check later more thoroughly]
-                showStationsForAllLines();
+                showStationsForAllLines();            //todo: check out more thoroughly
             }
         }
     }, false);
