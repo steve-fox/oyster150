@@ -34,6 +34,7 @@
     - initiate leaflet map with a long/lat and zoom to give a decent view of the Thames, taking in zone 1 and a chunk more
     - using mapbox light-v9 (this gives ~50,000 pageviews/month for free, the open street map code is below in case needed)
     //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    - todo: move these
     */
     var mymap = L.map('mapid').setView([51.509, -0.15], 13);
     L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
@@ -277,6 +278,7 @@
     // create the control group for the layers and add to the map
     // null is for baselayers which use radio buttons eg choose between a colour or greyscale base layer
     // collapsed sets whether the control group is collapsed by default and is controlled by collapsedLayerGroup, itself set according to browser size
+    // todo: this might get moved and the above could go into the lineData.js file
     lcontrol = L.control.layers(null, overlayMaps, { collapsed: collapsedLayerGroup }).addTo(mymap);
 
     // display of the full name, partial name or mini name in the station labels is determined here
@@ -342,24 +344,30 @@
 
 
 
-
+    // todo: surely this is not in the right place!
     addToMapUI();
 
 
-
+    // this function adds the extra UI elements to the layer group control so you have a "show/hide" all lines etc
+    // it adds event listeners for the checkbox/links etc
+    // this function gets re-run sometimes as the extra UI elements are prone to fall off when certain functions are happening
+    // this feels like a terrible way to achieve what i wanted but i am quite happy with the result and still haven't thought of a better way...
+    // ...of combining all the ui i need into one area
     function addToMapUI() {
-
 
         var lcaUI = document.querySelector('.leaflet-control-layers-overlays>div');
 
+        // stops adding multiples of the extra UI
         if (lcaUI === null) {
 
+            // create the container element for the extra UI
             var layerControlAdditionalUI = document.createElement('div', { id: 'layerui' });
             layerControlAdditionalUI.setAttribute("id", "layerui");
 
+
+            // 1. create the show/hide sentence (2 links)
             var showHideSpan = document.createElement('span');
             showHideSpan.setAttribute("class", "showhide");
-
 
             var showLink = document.createElement('a');
             showLink.setAttribute("class", "show");
@@ -367,6 +375,8 @@
             var hideLink = document.createElement('a', { class: 'hide' });
             hideLink.setAttribute("class", "hide");
 
+            // is this really the best way? i decided not to use innerhtml at some early stage because of perceived doing it right / modern / es6 way
+            // todo: check this section again in general but it does work so there
             var showLinkText = document.createTextNode('show');
             var showHideTextA = document.createTextNode(' or ');
             var hideLinkText = document.createTextNode('hide');
@@ -384,19 +394,12 @@
             hideLink.href = "#";
 
 
-
+            // 2. create separator div using the existing leaflet separator class
             var separatorDiv = document.createElement('div');
             separatorDiv.setAttribute("class", "leaflet-control-layers-separator");
 
 
-
-
-            // Get the parent node
-            var parentNode = document.querySelector('.leaflet-control-layers-overlays');
-
-
-
-
+            // 3. create stuff about hiding stations when the line is not visible ie checkbox/label/text
             var hideStationslabel = document.createElement('label');
             hideStationslabel.setAttribute("id", "hideStations");
 
@@ -404,6 +407,7 @@
             hideStations.setAttribute("type", "checkbox");
             hideStations.setAttribute("id", "hideStations");
 
+            // handle state on the hideStations checkbox
             if (hideStationLine) {
                 hideStations.checked = true;
             }
@@ -420,78 +424,72 @@
             hideStationslabel.appendChild(hideStationsSpan);
 
 
+            // 4. create text description for a key
             var keyDescription = document.createElement('span');
             keyDescription.setAttribute("class", "key-description")
             keyDescriptionText = document.createTextNode(`Dark grey borders = Zone 1   Light grey fill = Interchange   Pink border = Pink card reader`);
             keyDescription.appendChild(keyDescriptionText);
 
 
+            // Get the parent node (ie the leaflet layer control)
+            var parentNode = document.querySelector('.leaflet-control-layers-overlays');
 
-
-
-
-            // Insert the new node before the reference node
+            // add the container for additional ui to that
             parentNode.append(layerControlAdditionalUI);
 
+            // add each piece of the new UI to the container (grouped rather than each tiny piece)
             layerControlAdditionalUI.append(keyDescription);
-
             layerControlAdditionalUI.append(separatorDiv);
             layerControlAdditionalUI.append(showHideSpan);
             layerControlAdditionalUI.append(hideStationslabel);
 
-
-
-
+            // add event listeners for the 3 controls
             showLink.addEventListener('click', showAllLines);
             hideLink.addEventListener('click', hideAllLines);
             hideStationslabel.addEventListener('change', toggleHideStations);
+        }
+    }
 
 
+    // todo: property cycler could be it's own function
+    function showAllLines() {
+        // cycle through the properties (lines) in the overlayMaps and ADD each one to the map
+        for (var property in overlayMaps) {
+            if (overlayMaps.hasOwnProperty(property)) {
+                mymap.addLayer(overlayMaps[property]);
+            }
         }
 
+        addToMapUI();   // ensure extra UI does not fall off
+        showStationsForAllLines();
     }
 
-
-
-    //const checkboxes = document.querySelectorAll('input[type="checkbox"].leaflet-control-layers-selector');
-    const lineLayers = [centralLine, hammersmithAndCityLine, circleLine, overgroundLine, waterlooAndCityLine, jubileeLine, bakerlooLine, metropolitanLine, piccadillyLine, northernLine, districtLine, dlrLine, victoriaLine]
-
-    function showAllLines() {
-        lineLayers.forEach(lineLayer => {
-            mymap.addLayer(lineLayer);
-
-        });
-
-        addToMapUI();
-        showStationsforVisibleLinesOnly();
-    }
-
+    // todo: property cycler could be it's own function
     function hideAllLines() {
-        lineLayers.forEach(lineLayer => {
-            mymap.removeLayer(lineLayer);
-        });
+        // cycle through the properties (lines) in the overlayMaps and REMOVE each one to the map
+        for (var property in overlayMaps) {
+            if (overlayMaps.hasOwnProperty(property)) {
+                mymap.removeLayer(overlayMaps[property]);
+            }
+        }
 
-        if (hideStationLine) showStationsforVisibleLinesOnly();
-        addToMapUI();
+        if (hideStationLine) showStationsforVisibleLinesOnly();  // show stations for visible lines only, depending on user selected (checkbox)
+        addToMapUI();   // ensure extra UI does not fall off
     }
 
 
-
+    // handle the checking/unchecking of "only show a station when it's line is showing"
     function toggleHideStations() {
-        if (hideStationLine) {
-            //hideStations.checked =false;
-
+        if (hideStationLine) { // if true, make false and vice versa
             hideStationLine = false;
-            addToMapUI();
-            showStationsForAllLines();
+            //addToMapUI(); // todo: needed? remove if not
+            showStationsForAllLines();   // make sure the user's request is respected immediately, not just for the next click
         }
         else {
-            //hideStations.checked = true;
             hideStationLine = true;
-            addToMapUI();
-            showStationsforVisibleLinesOnly();
+            //addToMapUI(); // todo: needed? remove if not
+            showStationsforVisibleLinesOnly();  // make sure the user's request is respected immediately, not just for the next click
         }
-        //console.log ("hideStationLine " + hideStationLine)
     }
 
 
@@ -501,16 +499,17 @@
         // select all station icons
         var stations = document.querySelectorAll('.leaflet-marker-icon'), i;
 
-        // make them all invisible
+        // make them all visible
         for (i = 0; i < stations.length; ++i) {
             stations[i].style.display = "block";
         }
     }
 
-
+    // todo: needs re-arranged
     let visibleLineLayers = [];
-
+    // todo: needs re-arranged
     createVisibleLineArray();
+
 
     function showStationsforVisibleLinesOnly() {
 
@@ -533,18 +532,15 @@
                 stationsMakeVisible[i].style.display = "block";
             }
         });
-
-
-
-        //addToMapUI();
     }
 
 
+    // todo: property cycler could be it's own function - probably not for this one tho!
     function createVisibleLineArray() {
         // reset global array
         visibleLineLayers = [];
 
-        // loop through the layers object check if the layer is there, if it is, push it into the visibleLineLayers array
+        // loop through the layers object, check if the layer is there, if it is, push it into the visibleLineLayers array
         for (var property in overlayMaps) {
             if (overlayMaps.hasOwnProperty(property)) {
 
@@ -553,9 +549,6 @@
             }
         }
     }
-
-
-    const checkboxes = document.querySelectorAll('input[type="checkbox"].leaflet-control-layers-selector');
 
 
 
