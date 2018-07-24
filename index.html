@@ -26,69 +26,73 @@
 
 <script>
 
-    const largeBrowser = (window.innerWidth > 1000) ? true : false;
-    const collapsedLayerGroup = (largeBrowser) ? false : true;
-    const hideStationLine = true;
+    const largeBrowser = (window.innerWidth > 1000) ? true : false; // basic browser size measure for deciding which functions are appropriate
+    const collapsedLayerGroup = (largeBrowser) ? false : true; // layer group on map is collapse or not
+    let hideStationLine = true;
 
-
+    /** leaflet.js map
+    - initiate leaflet map with a long/lat and zoom to give a decent view of the Thames, taking in zone 1 and a chunk more
+    - using mapbox light-v9 (this gives ~50,000 pageviews/month for free, the open street map code is below in case needed)
+    //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    */
     var mymap = L.map('mapid').setView([51.509, -0.15], 13);
-
     L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
-        //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        //attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        attribution: 'Data sourced from <a href="https://tfl.gov.uk/info-for/open-data-users/">TfL</a>, map tiles courtesy of <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 18,
         minZoom: 12,
         id: 'mapbox.streets',
         accessToken: 'pk.eyJ1IjoiYm9ybmRpZ2l0YWwiLCJhIjoiY2ppeDd6d2YzMzIzZDNxbXAzZzl4cGRxNyJ9.svizivAiDIBlt5S78kb8Xg'
     }).addTo(mymap);
 
-
+    // set map bounds so users can't accidentally leave the tfl area
     mymap.setMaxBounds([
         [51.309, 0.286017],
         [51.809, -0.50]
     ]);
 
-
-
-
-
-
-
+    /** work with the stations array found in stationData.js
+    * filter out stations with zone 6 and up
+    * todo: filter out this unwanted data at source to make the project smaller and quicker
+    */
     let stationsZ15 = stations.filter(Z15 => { return !['6', '6+7', '7', '8', '9'].includes(Z15.zone) });
 
     stationsZ15.forEach(function (station, index) {
 
-        //L.marker([station.latitude, station.longitude]).addTo(mymap);
+        // define each icon (label for marker), including classes for zones/line or interchange/pinkreader availability
+        // the html also includes 3 spans with the name so you can have full name, shortened name and mini name
+        // todo: 3 names, not used in mobile, maybe stop that entering the html / not against overhaul of this part in general
         var myIcon = L.divIcon({
             className: `station-icon zone${station.zone} ${station.lines.replace(",", "").replace("&", "").toLowerCase()} pinkreader-${station.pinkreader} line-${(station.lines.indexOf(',') > -1) ? 'interchange' : station.lines.replace(/\s/g, "-").toLowerCase()}`,
             html: `<div class="station-label zone${station.zone}"><span class='fullname'>${station.fullname}</span><span class='name'>${station.name}</span><span class='mininame'>${station.mininame}</span></div>`
         });
 
-        // you can set .my-div-icon styles in CSS
+        // add each marker to map with long, lat and icon defined above
         L.marker([station.latitude, station.longitude], { icon: myIcon }).addTo(mymap)
+            // on click triggers logText function which logs long/lat of multiple stations making it possible to define lines
+            // todo: tried to use once function but this did not work - check it out but probably not supported in leaflet
             .on('click', logText, { capture: false, once: true })
+            // adds popup
+            // todo: improve design, add out of station interchanges where relevant, stations within 15 min walking distance
             .bindPopup(`<b>${station.fullname}</b><br/><br/><b>Line(s): ${station.lines}</b><br/><b>Zone: ${station.zone}</b>${station.pinkreader ? "<br/><br/><i>There is a <a href='https://tfl.gov.uk/fares-and-payments/oyster/using-oyster/pink-card-readers'>pink reader</a> at this station.</i>" : ""}`);
     });
 
 
-
-    let counter = 0;
-
     function logText(e) {
+        // logs long / lat of multiple stations so I can define the lines
         console.log(`[${e.target.getLatLng().lat}, ${e.target.getLatLng().lng}],`);
-        counter++;
     }
 
 
 
 
-
-
+    /** work with the lines found in lineData.js
+    - define the global line options
+    */
     var polylineOptions = { weight: 8, opacity: 0.6, smoothFactor: 10, lineJoin: 'round' };
 
-
+    // create the fragments of the DLR
     var plDLRStratfordInternationalWoolwichArsenal = L.polyline(polyDLRStratfordInternationalWoolwichArsenal, polylineOptions);
-    plDLRStratfordInternationalWoolwichArsenal.setStyle({ color: '#00A4A7' });
+    plDLRStratfordInternationalWoolwichArsenal.setStyle({ color: '#00A4A7' }); // define the specific options for the line ie colour for DLR
 
     var plDLRStratfordLewishham = L.polyline(polyDLRStratfordLewishham, polylineOptions);
     plDLRStratfordLewishham.setStyle({ color: '#00A4A7' });
@@ -104,12 +108,12 @@
 
 
 
-
+    // create the fragments of the Jubilee
     var plJubilee = L.polyline(polyJubilee, polylineOptions);
     plJubilee.setStyle({ color: '#A0A5A9' });
 
 
-
+    // create the fragments of the Overground
     var plOvergroundWestCroyden = L.polyline(polyOvergroundWestCroyden, polylineOptions);
     plOvergroundWestCroyden.setStyle({ color: '#EE7C0E' });
 
@@ -144,13 +148,13 @@
     plOvergroundRichmondWillesdenJunction.setStyle({ color: '#EE7C0E' });
 
 
-
+    // create the fragments of the Waterloo & City
     var plWaterlooAnddCity = L.polyline(polyWaterlooAnddCity, polylineOptions);
     plWaterlooAnddCity.setStyle({ color: '#95CDBA' });
 
 
 
-
+    // create the fragments of the District
     var plDistrictEalingBroadwayUpminster = L.polyline(polyDistrictEalingBroadwayUpminster, polylineOptions);
     plDistrictEalingBroadwayUpminster.setStyle({ color: '#00782A' });
 
@@ -165,7 +169,7 @@
 
 
 
-
+    // create the polyline "fragments" of the Northern
     var plNorthernBarnetBranch = L.polyline(polyNorthernBarnetBranch, polylineOptions);
     plNorthernBarnetBranch.setStyle({ color: '#000' });
 
@@ -186,7 +190,7 @@
 
 
 
-
+    // create the polyline "fragments" of the Piccadilly
     var plPiccadillyHeathrow = L.polyline(polyPiccadillyHeathrow, polylineOptions);
     plPiccadillyHeathrow.setStyle({ color: '#003688' });
 
@@ -195,7 +199,7 @@
 
 
 
-
+    // create the polyline "fragments" of the Metropolitan
     var plMetropolitanAmershamAldgate = L.polyline(polyMetropolitanAmershamAldgate, polylineOptions);
     plMetropolitanAmershamAldgate.setStyle({ color: '#9B0056' });
 
@@ -204,7 +208,7 @@
 
 
 
-
+    // create the polyline "fragments" of the Central
     var plCentralLoop = L.polyline(polyCentralLoop, polylineOptions);
     plCentralLoop.setStyle({ color: '#E32017' });
 
@@ -216,29 +220,29 @@
 
 
 
-
+    // create the polyline "fragments" of the Victoria
     var plVictoria = L.polyline(polyVictoria, polylineOptions);
     plVictoria.setStyle({ color: '#0098D4' });
 
 
 
-
+    // create the polyline "fragments" of the Hammersmith and City
     var plHammersmithAndCity = L.polyline(polyHammersmithAndCity, polylineOptions);
     plHammersmithAndCity.setStyle({ color: '#F3A9BB' });
 
 
 
-
+    // create the polyline "fragments" of the Circle
     var plCircle = L.polyline(polyCircle, polylineOptions);
     plCircle.setStyle({ color: '#FFD300' });
 
 
 
-
+    // create the polyline "fragments" of the Bakerloo
     var plBakerloo = L.polyline(polyBakerloo, polylineOptions);
     plBakerloo.setStyle({ color: '#B36305' });
 
-
+    // add all the polyline "fragments" together into a layer group for each line
     var hammersmithAndCityLine = L.layerGroup([plHammersmithAndCity]).addTo(mymap);
     var circleLine = L.layerGroup([plCircle]).addTo(mymap);
     var overgroundLine = L.layerGroup([plOvergroundRichmondWillesdenJunction, plOvergroundEustonWatfordJunction, plOvergroundGospelOakBarking, plOvergroundEdmontonGreenCheshunt, plOvergroundEnfieldTownHackneyDowns, plOvergroundLiverpoolStreetChingford, plOvergroundClaphamJunctionStratford, plOvergroundClaphamJunctionSurreyQuays, plOvergroundNewCross, plOvergroundCrystalPalace, plOvergroundWestCroyden]).addTo(mymap);
@@ -253,7 +257,7 @@
     var districtLine = L.layerGroup([plDistrictEalingBroadwayUpminster, plDistrictEarlsCourtEdgewareRoad, plDistrictWimbledonEarlsCourt, plDistrictRichmondTurnhamGreen]).addTo(mymap);
     var dlrLine = L.layerGroup([plDLRWestIndiaQuayWestferry, plDLRTowerGatewayShadwell, plDLRBankBeckton, plDLRStratfordLewishham, plDLRStratfordInternationalWoolwichArsenal]).addTo(mymap);
 
-
+    // create the overlayMaps object where each of the lines is a property of the object
     var overlayMaps = {
         "Central line": centralLine,
         "Hammersmith & City line": hammersmithAndCityLine,
@@ -270,27 +274,34 @@
         "Victoria line": victoriaLine
     };
 
+    // create the control group for the layers and add to the map
+    // null is for baselayers which use radio buttons eg choose between a colour or greyscale base layer
+    // collapsed sets whether the control group is collapsed by default and is controlled by collapsedLayerGroup, itself set according to browser size
     lcontrol = L.control.layers(null, overlayMaps, { collapsed: collapsedLayerGroup }).addTo(mymap);
 
+    // display of the full name, partial name or mini name in the station labels is determined here
+    // if the browser size is quite small, like on a mobile, we don't alter the display of this with zoom
+    // the result is the label stays the same as onload, which at the moment is no labels
+    // todo: using document.querySelectorAll('.station-label') seems expensive - easier if possible to change the style for .station-label to display:none
     mymap.on('zoomend', function () {
         if (largeBrowser) {
             const zoomLevel = mymap.getZoom();
 
-            if (zoomLevel < 14) {
+            if (zoomLevel < 14) { // if zoom less thn 14 make labels not appear
                 var stationlabel = document.querySelectorAll('.station-label'), i;
 
                 for (i = 0; i < stationlabel.length; ++i) {
                     stationlabel[i].style.display = "none";
                 }
             }
-            else {
+            else { // else make them appear
                 var stationlabel = document.querySelectorAll('.station-label'), i;
 
                 for (i = 0; i < stationlabel.length; ++i) {
                     stationlabel[i].style.display = "block";
                 }
 
-                if (zoomLevel > 16) {
+                if (zoomLevel > 16) { // if zoom over 16 make full name visible, hide the rest
                     var fullnamelabel = document.querySelectorAll('.fullname'), i;
                     var namelabel = document.querySelectorAll('.name'), i;
                     var mininamelabel = document.querySelectorAll('.mininame'), i;
@@ -301,7 +312,7 @@
                         mininamelabel[i].style.display = "none";
                     }
                 }
-                else if (zoomLevel === 16 || zoomLevel === 15) {
+                else if (zoomLevel === 16 || zoomLevel === 15) { // if zoom exactly 15 or 16 make regular name visible, hide the rest
                     var fullnamelabel = document.querySelectorAll('.fullname'), i;
                     var namelabel = document.querySelectorAll('.name'), i;
                     var mininamelabel = document.querySelectorAll('.mininame'), i;
@@ -312,7 +323,7 @@
                         mininamelabel[i].style.display = "none";
                     }
                 }
-                else if (zoomLevel === 14) {
+                else if (zoomLevel === 14) { // if zoom equal 14 make mini name visible, hide the rest
                     var fullnamelabel = document.querySelectorAll('.fullname'), i;
                     var namelabel = document.querySelectorAll('.name'), i;
                     var mininamelabel = document.querySelectorAll('.mininame'), i;
