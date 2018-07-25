@@ -4,53 +4,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
-        crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
-        crossorigin=""></script>
-    <script src="stationData.js"></script>
-    <script src="lineData.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Station list generator</title>
 
-    <title>Oyster £1.50</title>
+    <link href="prism.css" rel="stylesheet" />
 </head>
 
 <style></style>
 
+
+
+
+
+
 <body>
 
-    <div id="mapid"></div>
+<h1>Get Station Data</h1>
+<p>This page already hits TfLs data and makes an array called stationsList. To get the data into a more usable form, open the console and paste this code in and go from there:</p>
 
+
+    <pre><code class="language-javascript language-markup"><xmp>
+var lastStation = "";
+
+html = stationsList.sort((a, b) => a.commonName > b.commonName ? 1 : -1).map(astation => {
+    if (lastStation != astation.commonName.replace(/'/g, '&#039;')){
+        lastStation=astation.commonName.replace(/'/g, '&#39;');
+        return `{fullname: '${astation.commonName.replace(/'/g, '&#39;')}', \
+name: '${astation.commonName.replace(/'/g, '&#39;').replace(' Rail Station', '').replace(' Underground Station', '').replace(' DLR Station', '')}', \
+mininame: '${astation.commonName.replace(/'/g, '&#39;').substring(0, 5)}...', \
+longitude: ${astation.lon}, \
+latitude: ${astation.lat}, \
+pinkreader: ${['Blackhorse Road Rail Station', 'Canada Water Rail Station', 'Clapham Junction Rail Station', 'Gospel Oak Rail Station', 'Gunnersbury Rail Station', 'Hackney Central Rail Station', 'Hackney Downs Rail Station', 'Highbury & Islington Rail Station', 'Kensington (Olympia) Rail Station', 'Richmond (London) Rail Station', 'Stratford Rail Station', 'Surrey Quays Rail Station', 'West Brompton Rail Station', 'Whitechapel Rail Station', 'Willesden Junction Rail Station', 'Rayners Lane Underground Station', 'Wimbledon Underground Station'].includes(astation.commonName) ? "true" : "false"}, \
+lines: '${Array.prototype.map.call(astation.lines.filter(noBuses => {return ['Piccadilly', 'Bakerloo', 'Circle', 'Northern', 'Central', 'District', 'Jubilee', 'Metropolitan', 'Victoria', 'DLR', 'Hammersmith & City', 'Waterloo & City', 'London Overground'].includes(noBuses.name)}), s => ' ' +s.name).toString().trim()}', \
+zone: '${(astation.additionalProperties.findIndex(x => x.key=="Zone") == -1) ? '-1' : astation.additionalProperties[astation.additionalProperties.findIndex(x => x.key=="Zone")].value}'},
+        `;
+        }
+      }).join('').replace('-1', 'zone data for this station unavailable from tfl data');
+    console.log('const stations = [' + html + '];');
+</xmp></code></pre>
+
+
+    <script src="prism.js"></script>
 </body>
-
 
 <script>
 
-    var collapsedLayerGroup = true;
-
-    if (window.innerWidth > 1000) collapsedLayerGroup = false;
-
-
-    var hideStationLine = true;
-
-
-    var mymap = L.map('mapid').setView([51.509, -0.15], 13);
-
-    L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
-        //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        //attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 18,
-        minZoom: 12,
-        id: 'mapbox.streets',
-        accessToken: 'pk.eyJ1IjoiYm9ybmRpZ2l0YWwiLCJhIjoiY2ppeDd6d2YzMzIzZDNxbXAzZzl4cGRxNyJ9.svizivAiDIBlt5S78kb8Xg'
-    }).addTo(mymap);
-
-
-    mymap.setMaxBounds([
-        [51.309, 0.286017],
-        [51.809, -0.50]
-    ]);
-
+// todo: use some kind of async/wait etc to make the array come back full and ready to work with in the code, then display the processed array of stations on screen ready to paste
+// todo: avoid using the evil xmp or at least understand what, why and how
+// todo: tinker with the code to filter out zones you don't want
+// todo: make it possible to select what lines to work with ie a checkbox
 
     /*
 
@@ -132,6 +133,18 @@ zone: '${(astation.additionalProperties.findIndex(x => x.key=="Zone") == -1) ? '
       }).join('').replace('-1', 'zone data for this station unavailable from tfl data');
     console.log('const stations = [' + html + '];');
 
+
+
+
+
+// comment out when you don't need to hit tfl data
+const lines = [
+        { name: 'northern' }
+    ];
+
+
+*/
+
     const lines = [
         { name: 'northern' },
         { name: 'piccadilly' },
@@ -148,18 +161,6 @@ zone: '${(astation.additionalProperties.findIndex(x => x.key=="Zone") == -1) ? '
         { name: 'circle' }
     ];
 
-
-
-
-// comment out when you don't need to hit tfl data
-const lines = [
-        { name: 'northern' }
-    ];
-
-
-
-
-
     let stoppoints;
     const stationsList = [];
 
@@ -173,534 +174,7 @@ const lines = [
             .then(data => stationsList.push(...data));
 
     });
-*/
 
-
-
-
-
-
-    let stationsZ15 = stations.filter(Z15 => { return !['6', '6+7', '7', '8', '9'].includes(Z15.zone) });
-
-    stationsZ15.forEach(function (station, index) {
-
-        //L.marker([station.latitude, station.longitude]).addTo(mymap);
-        var myIcon = L.divIcon({
-            className: `station-icon zone${station.zone} ${station.lines.replace(",", "").replace("&", "").toLowerCase()} pinkreader-${station.pinkreader} line-${(station.lines.indexOf(',') > -1) ? 'interchange' : station.lines.replace(/\s/g, "-").toLowerCase()}`,
-            html: `<div class="station-label zone${station.zone}"><span class='fullname'>${station.fullname}</span><span class='name'>${station.name}</span><span class='mininame'>${station.mininame}</span></div>`
-        });
-
-        // you can set .my-div-icon styles in CSS
-        L.marker([station.latitude, station.longitude], { icon: myIcon }).addTo(mymap)
-            .on('click', logText, { capture: false, once: true })
-            .bindPopup(`<b>${station.fullname}</b><br/><br/><b>Line(s): ${station.lines}</b><br/><b>Zone: ${station.zone}</b>${station.pinkreader ? "<br/><br/><i>There is a <a href='https://tfl.gov.uk/fares-and-payments/oyster/using-oyster/pink-card-readers'>pink reader</a> at this station.</i>" : ""}`);
-    });
-
-
-
-    let counter = 0;
-
-    function logText(e) {
-        console.log(`[${e.target.getLatLng().lat}, ${e.target.getLatLng().lng}],`);
-        counter++;
-    }
-
-
-
-
-
-
-    var polylineOptions = { weight: 8, opacity: 0.6, smoothFactor: 10, lineJoin: 'round' };
-
-
-    var plDLRStratfordInternationalWoolwichArsenal = L.polyline(polyDLRStratfordInternationalWoolwichArsenal, polylineOptions);
-    plDLRStratfordInternationalWoolwichArsenal.setStyle({ color: '#00A4A7' });
-
-    var plDLRStratfordLewishham = L.polyline(polyDLRStratfordLewishham, polylineOptions);
-    plDLRStratfordLewishham.setStyle({ color: '#00A4A7' });
-
-    var plDLRBankBeckton = L.polyline(polyDLRBankBeckton, polylineOptions);
-    plDLRBankBeckton.setStyle({ color: '#00A4A7' });
-
-    var plDLRTowerGatewayShadwell = L.polyline(polyDLRTowerGatewayShadwell, polylineOptions);
-    plDLRTowerGatewayShadwell.setStyle({ color: '#00A4A7' });
-
-    var plDLRWestIndiaQuayWestferry = L.polyline(polyDLRWestIndiaQuayWestferry, polylineOptions);
-    plDLRWestIndiaQuayWestferry.setStyle({ color: '#00A4A7' });
-
-
-
-
-    var plJubilee = L.polyline(polyJubilee, polylineOptions);
-    plJubilee.setStyle({ color: '#A0A5A9' });
-
-
-
-    var plOvergroundWestCroyden = L.polyline(polyOvergroundWestCroyden, polylineOptions);
-    plOvergroundWestCroyden.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundCrystalPalace = L.polyline(polyOvergroundCrystalPalace, polylineOptions);
-    plOvergroundCrystalPalace.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundNewCross = L.polyline(polyOvergroundNewCross, polylineOptions);
-    plOvergroundNewCross.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundClaphamJunctionSurreyQuays = L.polyline(polyOvergroundClaphamJunctionSurreyQuays, polylineOptions);
-    plOvergroundClaphamJunctionSurreyQuays.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundClaphamJunctionStratford = L.polyline(polyOvergroundClaphamJunctionStratford, polylineOptions);
-    plOvergroundClaphamJunctionStratford.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundLiverpoolStreetChingford = L.polyline(polyOvergroundLiverpoolStreetChingford, polylineOptions);
-    plOvergroundLiverpoolStreetChingford.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundEnfieldTownHackneyDowns = L.polyline(polyOvergroundEnfieldTownHackneyDowns, polylineOptions);
-    plOvergroundEnfieldTownHackneyDowns.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundEdmontonGreenCheshunt = L.polyline(polyOvergroundEdmontonGreenCheshunt, polylineOptions);
-    plOvergroundEdmontonGreenCheshunt.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundGospelOakBarking = L.polyline(polyOvergroundGospelOakBarking, polylineOptions);
-    plOvergroundGospelOakBarking.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundEustonWatfordJunction = L.polyline(polyOvergroundEustonWatfordJunction, polylineOptions);
-    plOvergroundEustonWatfordJunction.setStyle({ color: '#EE7C0E' });
-
-    var plOvergroundRichmondWillesdenJunction = L.polyline(polyOvergroundRichmondWillesdenJunction, polylineOptions);
-    plOvergroundRichmondWillesdenJunction.setStyle({ color: '#EE7C0E' });
-
-
-
-    var plWaterlooAnddCity = L.polyline(polyWaterlooAnddCity, polylineOptions);
-    plWaterlooAnddCity.setStyle({ color: '#95CDBA' });
-
-
-
-
-    var plDistrictEalingBroadwayUpminster = L.polyline(polyDistrictEalingBroadwayUpminster, polylineOptions);
-    plDistrictEalingBroadwayUpminster.setStyle({ color: '#00782A' });
-
-    var plDistrictEarlsCourtEdgewareRoad = L.polyline(polyDistrictEarlsCourtEdgewareRoad, polylineOptions);
-    plDistrictEarlsCourtEdgewareRoad.setStyle({ color: '#00782A' });
-
-    var plDistrictWimbledonEarlsCourt = L.polyline(polyDistrictWimbledonEarlsCourt, polylineOptions);
-    plDistrictWimbledonEarlsCourt.setStyle({ color: '#00782A' });
-
-    var plDistrictRichmondTurnhamGreen = L.polyline(polyDistrictRichmondTurnhamGreen, polylineOptions);
-    plDistrictRichmondTurnhamGreen.setStyle({ color: '#00782A' });
-
-
-
-
-    var plNorthernBarnetBranch = L.polyline(polyNorthernBarnetBranch, polylineOptions);
-    plNorthernBarnetBranch.setStyle({ color: '#000' });
-
-    var plNorthernMillHillBranch = L.polyline(polyNorthernMillHillBranch, polylineOptions);
-    plNorthernMillHillBranch.setStyle({ color: '#000' });
-
-    var plNorthernCharingCrossBranch = L.polyline(polyNorthernCharingCrossBranch, polylineOptions);
-    plNorthernCharingCrossBranch.setStyle({ color: '#000' });
-
-    var plNorthernBankBranch = L.polyline(polyNorthernBankBranch, polylineOptions);
-    plNorthernBankBranch.setStyle({ color: '#000' });
-
-    var plNorthernMorden = L.polyline(polyNorthernMorden, polylineOptions);
-    plNorthernMorden.setStyle({ color: '#000' });
-
-    var plNorthernEdgeware = L.polyline(polyNorthernEdgeware, polylineOptions);
-    plNorthernEdgeware.setStyle({ color: '#000' });
-
-
-
-
-    var plPiccadillyHeathrow = L.polyline(polyPiccadillyHeathrow, polylineOptions);
-    plPiccadillyHeathrow.setStyle({ color: '#003688' });
-
-    var plPiccadillyUxbridge = L.polyline(polyPiccadillyUxbridge, polylineOptions);
-    plPiccadillyUxbridge.setStyle({ color: '#003688' });
-
-
-
-
-    var plMetropolitanAmershamAldgate = L.polyline(polyMetropolitanAmershamAldgate, polylineOptions);
-    plMetropolitanAmershamAldgate.setStyle({ color: '#9B0056' });
-
-    var plMetropolitanUxbridgeHarrowOnTheHill = L.polyline(polyMetropolitanUxbridgeHarrowOnTheHill, polylineOptions);
-    plMetropolitanUxbridgeHarrowOnTheHill.setStyle({ color: '#9B0056' });
-
-
-
-
-    var plCentralLoop = L.polyline(polyCentralLoop, polylineOptions);
-    plCentralLoop.setStyle({ color: '#E32017' });
-
-    var plCentralWestRuislipBranch = L.polyline(polyCentralWestRuislipBranch, polylineOptions);
-    plCentralWestRuislipBranch.setStyle({ color: '#E32017' });
-
-    var plCentralEalingBroadwayEpping = L.polyline(polyCentralEalingBroadwayEpping, polylineOptions);
-    plCentralEalingBroadwayEpping.setStyle({ color: '#E32017' });
-
-
-
-
-    var plVictoria = L.polyline(polyVictoria, polylineOptions);
-    plVictoria.setStyle({ color: '#0098D4' });
-
-
-
-
-    var plHammersmithAndCity = L.polyline(polyHammersmithAndCity, polylineOptions);
-    plHammersmithAndCity.setStyle({ color: '#F3A9BB' });
-
-
-
-
-    var plCircle = L.polyline(polyCircle, polylineOptions);
-    plCircle.setStyle({ color: '#FFD300' });
-
-
-
-
-    var plBakerloo = L.polyline(polyBakerloo, polylineOptions);
-    plBakerloo.setStyle({ color: '#B36305' });
-
-
-    var hammersmithAndCityLine = L.layerGroup([plHammersmithAndCity]).addTo(mymap);
-    var circleLine = L.layerGroup([plCircle]).addTo(mymap);
-    var overgroundLine = L.layerGroup([plOvergroundRichmondWillesdenJunction, plOvergroundEustonWatfordJunction, plOvergroundGospelOakBarking, plOvergroundEdmontonGreenCheshunt, plOvergroundEnfieldTownHackneyDowns, plOvergroundLiverpoolStreetChingford, plOvergroundClaphamJunctionStratford, plOvergroundClaphamJunctionSurreyQuays, plOvergroundNewCross, plOvergroundCrystalPalace, plOvergroundWestCroyden]).addTo(mymap);
-    var jubileeLine = L.layerGroup([plJubilee]).addTo(mymap);
-    var waterlooAndCityLine = L.layerGroup([plWaterlooAnddCity]).addTo(mymap);
-    var bakerlooLine = L.layerGroup([plBakerloo]).addTo(mymap);
-    var centralLine = L.layerGroup([plCentralWestRuislipBranch, plCentralLoop, plCentralEalingBroadwayEpping]).addTo(mymap);
-    var victoriaLine = L.layerGroup([plVictoria]).addTo(mymap);
-    var metropolitanLine = L.layerGroup([plMetropolitanAmershamAldgate, plMetropolitanUxbridgeHarrowOnTheHill]).addTo(mymap);
-    var piccadillyLine = L.layerGroup([plPiccadillyHeathrow, plPiccadillyUxbridge]).addTo(mymap);
-    var northernLine = L.layerGroup([plNorthernEdgeware, plNorthernMorden, plNorthernBankBranch, plNorthernCharingCrossBranch, plNorthernBarnetBranch, plNorthernMillHillBranch]).addTo(mymap);
-    var districtLine = L.layerGroup([plDistrictEalingBroadwayUpminster, plDistrictEarlsCourtEdgewareRoad, plDistrictWimbledonEarlsCourt, plDistrictRichmondTurnhamGreen]).addTo(mymap);
-    var dlrLine = L.layerGroup([plDLRWestIndiaQuayWestferry, plDLRTowerGatewayShadwell, plDLRBankBeckton, plDLRStratfordLewishham, plDLRStratfordInternationalWoolwichArsenal]).addTo(mymap);
-
-
-    var overlayMaps = {
-        "Central line": centralLine,
-        "Hammersmith & City line": hammersmithAndCityLine,
-        "Circle line": circleLine,
-        "Overground line": overgroundLine,
-        "Waterloo and City line": waterlooAndCityLine,
-        "Jubilee line": jubileeLine,
-        "Bakerloo line": bakerlooLine,
-        "Metropolitan line": metropolitanLine,
-        "Piccadilly line": piccadillyLine,
-        "Northern line": northernLine,
-        "District line": districtLine,
-        "DLR": dlrLine,
-        "Victoria line": victoriaLine
-    };
-
-    lcontrol = L.control.layers(null, overlayMaps, { collapsed: collapsedLayerGroup }).addTo(mymap);
-
-    mymap.on('zoomend', function () {
-
-        const zoomLevel = mymap.getZoom();
-
-        if (zoomLevel < 14) {
-            var stationlabel = document.querySelectorAll('.station-label'), i;
-
-            for (i = 0; i < stationlabel.length; ++i) {
-                stationlabel[i].style.display = "none";
-            }
-        }
-        else {
-            var stationlabel = document.querySelectorAll('.station-label'), i;
-
-            for (i = 0; i < stationlabel.length; ++i) {
-                stationlabel[i].style.display = "block";
-            }
-
-            if (zoomLevel > 16) {
-                var fullnamelabel = document.querySelectorAll('.fullname'), i;
-                var namelabel = document.querySelectorAll('.name'), i;
-                var mininamelabel = document.querySelectorAll('.mininame'), i;
-
-                for (i = 0; i < fullnamelabel.length; ++i) {
-                    fullnamelabel[i].style.display = "block";
-                    namelabel[i].style.display = "none";
-                    mininamelabel[i].style.display = "none";
-                }
-            }
-            else if (zoomLevel === 16 || zoomLevel === 15) {
-                var fullnamelabel = document.querySelectorAll('.fullname'), i;
-                var namelabel = document.querySelectorAll('.name'), i;
-                var mininamelabel = document.querySelectorAll('.mininame'), i;
-
-                for (i = 0; i < fullnamelabel.length; ++i) {
-                    fullnamelabel[i].style.display = "none";
-                    namelabel[i].style.display = "block";
-                    mininamelabel[i].style.display = "none";
-                }
-            }
-            else if (zoomLevel === 14) {
-                var fullnamelabel = document.querySelectorAll('.fullname'), i;
-                var namelabel = document.querySelectorAll('.name'), i;
-                var mininamelabel = document.querySelectorAll('.mininame'), i;
-
-                for (i = 0; i < fullnamelabel.length; ++i) {
-                    fullnamelabel[i].style.display = "none";
-                    namelabel[i].style.display = "none";
-                    mininamelabel[i].style.display = "block";
-                }
-            }
-        }
-
-
-    });
-
-
-
-
-    addToMapUI();
-
-
-
-    function addToMapUI() {
-
-
-        var lcaUI = document.querySelector('.leaflet-control-layers-overlays>div');
-
-        if (lcaUI === null) {
-
-            var layerControlAdditionalUI = document.createElement('div', { id: 'layerui' });
-            layerControlAdditionalUI.setAttribute("id", "layerui");
-
-            var showHideSpan = document.createElement('span');
-            showHideSpan.setAttribute("class", "showhide");
-
-
-            var showLink = document.createElement('a');
-            showLink.setAttribute("class", "show");
-
-            var hideLink = document.createElement('a', { class: 'hide' });
-            hideLink.setAttribute("class", "hide");
-
-            var showLinkText = document.createTextNode('show');
-            var showHideTextA = document.createTextNode(' or ');
-            var hideLinkText = document.createTextNode('hide');
-            var showHideTextB = document.createTextNode(' all lines');
-
-            showHideSpan.appendChild(showLink);
-            showHideSpan.appendChild(showHideTextA);
-            showHideSpan.appendChild(hideLink);
-            showHideSpan.appendChild(showHideTextB);
-
-            showLink.appendChild(showLinkText);
-            hideLink.appendChild(hideLinkText);
-
-            showLink.href = "#";
-            hideLink.href = "#";
-
-
-
-            var separatorDiv = document.createElement('div');
-            separatorDiv.setAttribute("class", "leaflet-control-layers-separator");
-
-
-
-
-            // Get the parent node
-            var parentNode = document.querySelector('.leaflet-control-layers-overlays');
-
-
-
-
-            var hideStationslabel = document.createElement('label');
-            hideStationslabel.setAttribute("id", "hideStations");
-
-            var hideStations = document.createElement('input');
-            hideStations.setAttribute("type", "checkbox");
-            hideStations.setAttribute("id", "hideStations");
-
-            if (hideStationLine) {
-                hideStations.checked = true;
-            }
-            else {
-                hideStations.checked = false;
-            }
-
-            var hideStationsSpan = document.createElement('span');
-            hideStationsSpan.setAttribute("class", "hideStationsSpan");
-            var hideStationText = document.createTextNode(`only show a station when it's line is showing`);
-            hideStationsSpan.appendChild(hideStationText);
-
-            hideStationslabel.appendChild(hideStations);
-            hideStationslabel.appendChild(hideStationsSpan);
-
-
-            var keyDescription = document.createElement('span');
-            keyDescription.setAttribute("class", "key-description")
-            keyDescriptionText = document.createTextNode(`Dark grey borders = Zone 1   Light grey fill = Interchange   Pink border = Pink card reader`);
-            keyDescription.appendChild(keyDescriptionText);
-
-
-
-
-
-
-            // Insert the new node before the reference node
-            parentNode.append(layerControlAdditionalUI);
-
-            layerControlAdditionalUI.append(keyDescription);
-
-            layerControlAdditionalUI.append(separatorDiv);
-            layerControlAdditionalUI.append(showHideSpan);
-            layerControlAdditionalUI.append(hideStationslabel);
-
-
-
-
-            showLink.addEventListener('click', showAllLines);
-            hideLink.addEventListener('click', hideAllLines);
-            hideStationslabel.addEventListener('change', toggleHideStations);
-
-
-        }
-
-    }
-
-
-
-    //const checkboxes = document.querySelectorAll('input[type="checkbox"].leaflet-control-layers-selector');
-    const lineLayers = [centralLine, hammersmithAndCityLine, circleLine, overgroundLine, waterlooAndCityLine, jubileeLine, bakerlooLine, metropolitanLine, piccadillyLine, northernLine, districtLine, dlrLine, victoriaLine]
-
-    function showAllLines() {
-        lineLayers.forEach(lineLayer => {
-            mymap.addLayer(lineLayer);
-
-        });
-
-        addToMapUI();
-        showStationsforVisibleLinesOnly();
-    }
-
-    function hideAllLines() {
-        lineLayers.forEach(lineLayer => {
-            mymap.removeLayer(lineLayer);
-        });
-
-        if (hideStationLine) showStationsforVisibleLinesOnly();
-        addToMapUI();
-    }
-
-
-
-    function toggleHideStations() {
-        if (hideStationLine) {
-            //hideStations.checked =false;
-
-            hideStationLine = false;
-            addToMapUI();
-            showStationsForAllLines();
-        }
-        else {
-            //hideStations.checked = true;
-            hideStationLine = true;
-            addToMapUI();
-            showStationsforVisibleLinesOnly();
-        }
-        //console.log ("hideStationLine " + hideStationLine)
-    }
-
-
-
-
-    function showStationsForAllLines() {
-        // select all station icons
-        var stations = document.querySelectorAll('.leaflet-marker-icon'), i;
-
-        // make them all invisible
-        for (i = 0; i < stations.length; ++i) {
-            stations[i].style.display = "block";
-        }
-    }
-
-
-    let visibleLineLayers = [];
-
-    createVisibleLineArray();
-
-    function showStationsforVisibleLinesOnly() {
-
-        // select all station icons
-        var stations = document.querySelectorAll('.leaflet-marker-icon'), i;
-
-        // make them all invisible
-        for (i = 0; i < stations.length; ++i) {
-            stations[i].style.display = "none";
-        }
-
-        // loop through the lines that you want to be visible
-        visibleLineLayers.forEach((visibleLineLayer) => {
-
-            // select the station icons by class, using the visible station
-            var stationsMakeVisible = document.querySelectorAll(`.${visibleLineLayer}`), i;
-
-            // make them visible
-            for (i = 0; i < stationsMakeVisible.length; ++i) {
-                stationsMakeVisible[i].style.display = "block";
-            }
-        });
-
-
-
-        //addToMapUI();
-    }
-
-
-    function createVisibleLineArray() {
-        // reset global array
-        visibleLineLayers = [];
-
-        // loop through the layers object check if the layer is there, if it is, push it into the visibleLineLayers array
-        for (var property in overlayMaps) {
-            if (overlayMaps.hasOwnProperty(property)) {
-
-                // shortened easier to understand version without processing the text/ternary etc: if (mymap.hasLayer(overlayMaps[property])){visibleLineLayers.push((property)};
-                if (mymap.hasLayer(overlayMaps[property])) { visibleLineLayers.push((property.indexOf(" ") == -1) ? property.toLowerCase() : property.slice(0, property.indexOf(" ")).toLowerCase()) };
-            }
-        }
-    }
-
-
-    const checkboxes = document.querySelectorAll('input[type="checkbox"].leaflet-control-layers-selector');
-
-
-
-    document.addEventListener('click', function () {
-        if (event.target.classList.contains('leaflet-control-layers-selector') || event.target.classList.contains('show') || event.target.classList.contains('hide')) {
-
-            /*
-                    // reset global array
-                    visibleLineLayers = [];
-
-                    // loop through the layers object check if the layer is there, if it is, push it into the visibleLineLayers array
-                    for (var property in overlayMaps) {
-                        if (overlayMaps.hasOwnProperty(property)) {
-
-                            // shortened easier to understand version without processing the text/ternary etc: if (mymap.hasLayer(overlayMaps[property])){visibleLineLayers.push((property)};
-                            if (mymap.hasLayer(overlayMaps[property])){visibleLineLayers.push((property.indexOf(" ") == -1) ? property.toLowerCase() : property.slice(0, property.indexOf(" ")).toLowerCase())};
-                        }
-                    }
-                    */
-
-            createVisibleLineArray();
-
-
-            if (hideStationLine) {
-                showStationsforVisibleLinesOnly();
-            }
-            else {
-                showStationsForAllLines();
-            }
-        }
-    }, false);
 
 
 
