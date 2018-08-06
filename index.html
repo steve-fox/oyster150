@@ -53,6 +53,7 @@
 
     // when location is found, run function, set view and hopefully update position
     mymap.on('locationfound', onLocationFound);
+    //mymap.locate({ setView: true, watch: true, maxZoom: 8 });
     mymap.locate({ watch: true });
 
 
@@ -464,7 +465,7 @@
     function onLocationFound(e) {
         var radius = e.accuracy / 2;
         L.marker(e.latlng).addTo(mymap)
-            .bindPopup("You are within " + radius + " meters from this point").openPopup();
+            .bindPopup("You are within " + radius + " meters from this point, as shown by the circle");
         L.circle(e.latlng, radius).addTo(mymap);
     }
 
