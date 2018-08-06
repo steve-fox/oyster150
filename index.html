@@ -51,6 +51,18 @@
         [51.809, -0.50]
     ]);
 
+
+
+
+
+    mymap.on('locationfound', onLocationFound);
+    mymap.locate({ setView: true, watch: true, maxZoom: 8 });
+
+
+
+
+
+
     /** work with the stations array found in stationData.js
     * filter out stations with zone 6 and up
     * todo: filter out this unwanted data at source to make the project smaller and quicker
@@ -448,6 +460,15 @@
             hideLink.addEventListener('click', hideAllLines);
             hideStationslabel.addEventListener('change', toggleHideStations);
         }
+    }
+
+
+
+    function onLocationFound(e) {
+        var radius = e.accuracy / 2;
+        L.marker(e.latlng).addTo(mymap)
+            .bindPopup("You are within " + radius + " meters from this point").openPopup();
+        L.circle(e.latlng, radius).addTo(mymap);
     }
 
 
