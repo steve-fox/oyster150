@@ -178,6 +178,10 @@
     var plDistrictRichmondTurnhamGreen = L.polyline(polyDistrictRichmondTurnhamGreen, polylineOptions);
     plDistrictRichmondTurnhamGreen.setStyle({ color: '#00782A' });
 
+    var plDistrictEarlsCourtKensingtonOlympia = L.polyline(polyDistrictEarlsCourtKensingtonOlympia, polylineOptions);
+    plDistrictEarlsCourtKensingtonOlympia.setStyle({ color: '#00782A' });
+
+
 
 
     // create the polyline "fragments" of the Northern
@@ -265,7 +269,7 @@
     var metropolitanLine = L.layerGroup([plMetropolitanAmershamAldgate, plMetropolitanUxbridgeHarrowOnTheHill]).addTo(mymap);
     var piccadillyLine = L.layerGroup([plPiccadillyHeathrow, plPiccadillyUxbridge]).addTo(mymap);
     var northernLine = L.layerGroup([plNorthernEdgeware, plNorthernMorden, plNorthernBankBranch, plNorthernCharingCrossBranch, plNorthernBarnetBranch, plNorthernMillHillBranch]).addTo(mymap);
-    var districtLine = L.layerGroup([plDistrictEalingBroadwayUpminster, plDistrictEarlsCourtEdgewareRoad, plDistrictWimbledonEarlsCourt, plDistrictRichmondTurnhamGreen]).addTo(mymap);
+    var districtLine = L.layerGroup([plDistrictEalingBroadwayUpminster, plDistrictEarlsCourtEdgewareRoad, plDistrictWimbledonEarlsCourt, plDistrictRichmondTurnhamGreen, plDistrictEarlsCourtKensingtonOlympia]).addTo(mymap);
     var dlrLine = L.layerGroup([plDLRWestIndiaQuayWestferry, plDLRTowerGatewayShadwell, plDLRBankBeckton, plDLRStratfordLewishham, plDLRStratfordInternationalWoolwichArsenal]).addTo(mymap);
 
     // create the overlayMaps object where each of the lines is a property of the object
