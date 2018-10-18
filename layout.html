@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+        crossorigin=""></script>
+    <script src="stationData.js"></script>
+    <script src="lineData.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <title>Oyster £1.50</title>
+</head>
+
+<style>
+    /************************************************************ MAP SECTION */
+
+    /********************************* map structure */
+
+    #mapid {
+        height: 580px;
+        background-color: cornflowerblue;
+        grid-area: map;
+    }
+
+
+    @import url('https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    body {
+        background-color: #f1f1f1;
+        color: #666;
+        font-family: "Montserrat", sans-serif;
+        font-weight: 400;
+    }
+
+    /************************************************************ PAGE LAYOUT */
+
+    .container {
+        display: grid;
+        grid-template-columns: 10rem 1fr 10rem;
+        width: 100%;
+        grid-template-areas: ". header . " ". main ." ". map ." "footer footer footer";
+        margin-top: 6rem;
+        grid-row-gap: 2rem;
+    }
+
+    /************************************************************ HEADER */
+
+    header {
+        grid-area: header;
+    }
+
+    header nav {
+        justify-self: start;
+        list-style-typex: none;
+    }
+
+
+    header nav ul {
+        display: flex;
+        align-items: center;
+    }
+
+
+    header nav li {
+        list-style-type: none;
+        font-size: 28px;
+    }
+
+    header nav li:not(.logo) {
+        margin-left: 40px;
+    }
+
+
+
+
+
+
+    header nav ul li.logo {
+        margin-right: auto;
+    }
+
+    li.logo svg {
+        width: 50%;
+        opacityx: 0.7;
+    }
+
+    nav a {
+        padding-bottom: 3px;
+    }
+
+    nav a.active {
+        border-bottom: 3px solid #666;
+    }
+
+    nav a:not(.active):hover {
+        border-bottom: 3px solid #aaa;
+    }
+
+    /************************************************************ MAIN CONTENT */
+
+    .main {
+        grid-area: main;
+    }
+
+    .main h2 {
+        font-size: 32px;
+        margin: 1rem 0;
+        color: #50c6db;
+    }
+
+    .main p {
+        font-size: 1rem;
+        margin-bottom: .75rem;
+
+
+    }
+
+
+
+
+    .main .hero {
+        padding-left: 27%;
+        font-size: 28px;
+        line-height: 2.4rem;
+        padding-top: 40px
+    }
+
+
+    /************************************************************ FOOTER */
+
+    footer {
+        display: flex;
+        grid-area: footer;
+        justify-content: space-between;
+        color: #666;
+        border-top: 4px solid #e4e4e4;
+        background-color: #eaeaea;
+        padding: 2rem 10rem 5rem 10rem;
+        font-size: 18px;
+
+        margin-top: 2.5rem;
+    }
+
+    footer div {
+        max-width: 22%;
+    }
+
+    footer p {
+        color: #434344;
+
+
+    }
+
+    #footer-one {
+        display: flex;
+        flex-wrap: wrap;
+        max-width: 25%;
+        justify-content: space-between;
+        align-content: flex-start;
+    }
+
+    #footer-one svg {
+        width: 25%;
+        opacity: 0.3;
+        height: auto;
+        align-self: flex-start;
+    }
+
+    #footer-one p {
+        max-width: 70%;
+    }
+
+    footer li {
+        list-style-type: none;
+    }
+
+    /************************************************************ MEDIA QUERIES */
+
+    @media (max-width: 600px) {
+        .container {
+            /*  Redefine the grid into a single column layout. */
+            grid-template-columns: 1fr;
+            grid-template-areas: "header" "main" "sidebar" "footer";
+        }
+    }
+</style>
+
+<body>
+    <link rel="stylesheet" href="https://use.typekit.net/kww8nph.css">
+
+
+    <div class="container">
+
+        <header>
+            <nav>
+                <ul>
+                    <li class="logo">
+                        <a href="#">
+
+
+                            <svg width="252" height="144" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 252 144">
+                                <style>
+                                    .st1 {
+                                        fill: #fff
+                                    }
+                                </style>
+                                <path fill="none" id="canvas_background" d="M-1-1h582v402H-1z" />
+                                <g>
+                                    <path id="svg_1" d="M238 0h-54a170 170 0 0 1 0 144h54c8 0 14-6 14-14V14c0-8-6-14-14-14z" fill="#2a2b79" />
+                                    <path id="svg_2" class="st1" d="M184 0h-19a168 168 0 0 1 0 144h19a169 169 0 0 0 0-144z" />
+                                    <path id="svg_3" class="st1" d="M184 0h-19a168 168 0 0 1 0 144h19a169 169 0 0 0 0-144z" />
+                                    <path id="svg_4" class="st1" d="M0 14v116c0 8 6 14 14 14h151a169 169 0 0 0 0-144H14C6 0 0 6 0 14z" />
+                                    <path id="svg_5" class="st1" d="M0 14v116c0 8 6 14 14 14h151a169 169 0 0 0 0-144H14C6 0 0 6 0 14z" />
+                                    <path id="svg_6" d="M0 14v116c0 8 6 14 14 14h151a169 169 0 0 0 0-144H14C6 0 0 6 0 14z" fill="#2c7bbf" />
+                                    <text stroke="#000" font-weight="bold" font-family="'Trebuchet MS', Gadget, sans-serif" font-size="63" id="svg_7" y="94"
+                                        x="6.5" stroke-width="0" fill="#fff">£1.50</text>
+                                </g>
+                            </svg>
+
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="active">Map</a>
+                    </li>
+                    <li>
+                        <a href="#">Tips</a>
+                    </li>
+                    <li>
+                        <a href="#">Trips</a>
+                    </li>
+                    <li>
+                        <a href="#">Gotchas</a>
+                    </li>
+                    <li>
+                        <a href="#">Q & A</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </header>
+
+
+
+        <section class="main">
+
+
+
+            <p class="hero">How far can you go in London for £1.50? Here are some oyster tips & low cost trips that help the skint, frugal
+                and downright tight to navigate the capital without selling a kidney. Simply by avoiding Zone 1, most * off
+                peak journeys in Zone 2 - 5 will be £1.50 (* yep, that was most). </p>
+
+
+
+
+        </section>
+
+        <div id="mapid"></div>
+
+
+        <footer>
+            <div id="footer-one">
+
+
+                <svg width="252" height="144" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 252 144">
+                    <style>
+                        .st1 {
+                            fill: #fff
+                        }
+                    </style>
+                    <path fill="none" id="canvas_background" d="M-1-1h582v402H-1z" />
+                    <g>
+                        <path id="svg_1" d="M238 0h-54a170 170 0 0 1 0 144h54c8 0 14-6 14-14V14c0-8-6-14-14-14z" fill="#2a2b79" />
+                        <path id="svg_2" class="st1" d="M184 0h-19a168 168 0 0 1 0 144h19a169 169 0 0 0 0-144z" />
+                        <path id="svg_3" class="st1" d="M184 0h-19a168 168 0 0 1 0 144h19a169 169 0 0 0 0-144z" />
+                        <path id="svg_4" class="st1" d="M0 14v116c0 8 6 14 14 14h151a169 169 0 0 0 0-144H14C6 0 0 6 0 14z" />
+                        <path id="svg_5" class="st1" d="M0 14v116c0 8 6 14 14 14h151a169 169 0 0 0 0-144H14C6 0 0 6 0 14z" />
+                        <path id="svg_6" d="M0 14v116c0 8 6 14 14 14h151a169 169 0 0 0 0-144H14C6 0 0 6 0 14z" fill="#2c7bbf" />
+                        <text stroke="#000" font-weight="bold" font-family="'Trebuchet MS', Gadget, sans-serif" font-size="63" id="svg_7" y="94"
+                            x="6.5" stroke-width="0" fill="#fff">£1.50</text>
+                    </g>
+                </svg>
+
+                <p>Oyster 150 is a guide to travelling around London more cheaply. We have tips and gotchas, plus area guides
+                    that help you plan trips.</p>
+
+                <p>Site by Steve Fox</p>
+            </div>
+            <div>
+                <h4>Fares, Hacks & Journey Planning</h4>
+                <ul>
+                    <li>
+                        <a href="https://tfl.gov.uk/fares-and-payments/fares/single-fare-finder" target="_blank">TfL Single Fare Finder</a>
+                    </li>
+                    <li>
+                        <a href="https://tfl.gov.uk/plan-a-journey/" target="_blank">TfL Plan a Journey</a>
+                    </li>
+                    <li>
+                        <a href="https://citymapper.com/london" target="_blank">Citymapper - awesome journey planning</a>
+                    </li>
+                    <li>
+                        <a href="https://tfl.gov.uk/modes/walking/" target="_blank ">TfL Walking London</a>
+                    </li>
+                    <li>
+                        <a href="https://tfl.gov.uk/corporate/publications-and-reports/out-of-station-interchanges" target="_blank ">Out of Station Interchanges</a>
+                    </li>
+
+
+
+
+                    <li>
+                        <a href="" target="_blank ">FOI act centre</a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h4>Off Peak Awesome</h4>
+                <ul>
+                    <li>
+                        <a href="https://www.timeout.com/london/things-to-do/welcome-to-the-wonderful-world-of-off-peak
+                            " target="_blank ">Timeout off-peak guide</a>
+                    </li>
+                    <li>
+                        <a href="http://www.skintlondon.com/" target="_blank ">Skint London</a>
+                    </li>
+
+                </ul>
+            </div>
+            <div>
+                <h4>Thanks to:</h4>
+                <ul>
+                    <li>
+                        <a href="https://www.netlify.com/
+                            " target="_blank ">Netlify for their free hosting</a>
+                    </li>
+                    <li>
+                        <a href="https://leafletjs.com/" target="_blank ">Leaflet for their open source map engine</a>
+                    </li>
+
+                    <li>
+                        <a href="https://www.mapbox.com/" target="_blank ">Mapbox for their free maps</a>
+                    </li>
+                    <li>
+                        <a href="https://tfl.gov.uk/info-for/open-data-users/" target="_blank ">TfL for their data</a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </footer>
+
+    </div>
+
+
+
+
+
+</body>
+
+
+
+
+</html>

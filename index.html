@@ -54,7 +54,7 @@
     // when location is found, run function, set view and hopefully update position
     mymap.on('locationfound', onLocationFound);
     //mymap.locate({ setView: true, watch: true, maxZoom: 8, maximumAge = 0 });
-    mymap.locate({ watch: true, enableHighAccuracy: true, maximumAge: 1000 });
+    mymap.locate({ setView: true, watch: false, enableHighAccuracy: true, maximumAge: 1000 });
 
 
 
